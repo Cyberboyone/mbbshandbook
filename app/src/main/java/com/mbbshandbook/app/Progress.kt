@@ -1,8 +1,8 @@
 package com.mbbshandbook.app
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateSetOf
 import com.mbbshandbook.app.data.Handbook
 
 /** Tracks which topics have been read; persisted in SharedPreferences. */
@@ -10,7 +10,9 @@ object Progress {
     private const val PREFS = "progress"
     private const val KEY = "read_ids"
 
-    val readIds = mutableStateSetOf<String>()
+    // SnapshotStateList (observable), kept duplicate-free by markRead()/init();
+    // mutableStateSetOf needs Compose 1.8+ but this project is on 1.7.x.
+    val readIds = mutableStateListOf<String>()
     private var prefs: android.content.SharedPreferences? = null
 
     fun init(context: Context) {
@@ -21,7 +23,8 @@ object Progress {
     }
 
     fun markRead(topicId: String) {
-        if (readIds.add(topicId)) {
+        if (!readIds.contains(topicId)) {
+            readIds.add(topicId)
             prefs?.edit()?.putStringSet(KEY, readIds.toSet())?.apply()
         }
     }
