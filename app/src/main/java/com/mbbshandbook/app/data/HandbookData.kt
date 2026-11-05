@@ -873,6 +873,131 @@ object Handbook {
         )
     )
 
+    // ------------------------------------------------------------------
+    // 10. Mnemonics
+    // ------------------------------------------------------------------
+    private val mnemonicsSection = Section(
+        id = "mnemonics",
+        title = "Mnemonics Vault",
+        description = "The classic memory hooks, ready when you need them",
+        topics = listOf(
+            Topic(
+                id = "mnemonics-anatomy",
+                title = "Anatomy Mnemonics",
+                summary = "Cranial nerves, plexus roots, carpal bones and more.",
+                blocks = listOf(
+                    b(
+                        "Cranial nerves: 'Oh Oh Oh To Touch And Feel Very Good Velvet, Ah Heaven' (Olfactory, Optic, Oculomotor, Trochlear, Trigeminal, Abducens, Facial, Vestibulocochlear, Glossopharyngeal, Vagus, Accessory, Hypoglossal)",
+                        "Sensory/Motor/Both: 'Some Say Marry Money, But My Brother Says Big Brains Matter More'",
+                        "Carpal bones: 'Some Lovers Try Positions That They Can't Handle' (Scaphoid, Lunate, Triquetrum, Pisiform, Trapezium, Trapezoid, Capitate, Hamate)",
+                        "Brachial plexus: 'Real Texans Drink Cold Beer' (Roots, Trunks, Divisions, Cords, Branches)",
+                        "Femoral triangle lateral to medial: NAVEL (Nerve, Artery, Vein, Empty space, Lymphatics)",
+                        "Rotator cuff: SITS (Supraspinatus, Infraspinatus, Teres minor, Subscapularis)",
+                        "Diaphragm: 'C3, 4, 5 keep the diaphragm alive'",
+                        "Erector spinae: 'I Like Standing' (Iliocostalis, Longissimus, Spinalis - lateral to medial)"
+                    ),
+                    tip("Say mnemonics out loud while pointing at a diagram - dual coding makes them stick twice as fast.")
+                )
+            ),
+            Topic(
+                id = "mnemonics-medicine",
+                title = "Clinical Mnemonics",
+                summary = "SOCRATES, MUDPILES, CHA2DS2-VASc and the ward classics.",
+                blocks = listOf(
+                    b(
+                        "Pain history: SOCRATES (Site, Onset, Character, Radiation, Associations, Time, Exacerbating factors, Severity)",
+                        "Stroke symptoms: FAST (Face drooping, Arm weakness, Speech difficulty, Time to call)",
+                        "AF stroke risk: CHA2DS2-VASc (CHF, Hypertension, Age 75+ [2], Diabetes, Stroke [2], Vascular disease, Age 65-74, Sex category)",
+                        "High anion gap acidosis: MUDPILES (Methanol, Uraemia, DKA, Propylene glycol, Iron/INH, Lactate, Ethylene glycol, Salicylates)",
+                        "Pancreatitis causes: I GET SMASHED (Idiopathic, Gallstones, Ethanol, Trauma, Steroids, Mumps, Autoimmune, Scorpion sting, Hyperlipidaemia/Hypercalcaemia, ERCP, Drugs)",
+                        "Delirium causes: PINCH ME (Pain, Infection, Nutrition, Constipation, Hydration, Medication, Environment)",
+                        "Depression (SIG E CAPS): Sleep, Interest, Guilt, Energy, Concentration, Appetite, Psychomotor, Suicidal ideation",
+                        "Handover: SBAR (Situation, Background, Assessment, Recommendation)",
+                        "Emergency assessment: ABCDE (Airway, Breathing, Circulation, Disability, Exposure)"
+                    ),
+                    tip("Mnemonics are retrieval cues, not understanding. Learn the concept first, then hang the mnemonic on it.")
+                )
+            ),
+            Topic(
+                id = "mnemonics-pharm-micro",
+                title = "Pharm & Micro Mnemonics",
+                summary = "Drug toxicities and bug hooks that examiners love.",
+                blocks = listOf(
+                    b(
+                        "TB drugs side effects: RIPE - Rifampicin (Red secretions), Isoniazid (peripheral Neuropathy), Pyrazinamide (hyperuricaemia/gout), Ethambutol (Eye toxicity)",
+                        "Aminoglycosides: 'Mean old (oto) nephro-toxic GNATS' - ototoxicity + nephrotoxicity, Gram-Negative coverage",
+                        "Tetracyclines: avoid in pregnancy/children - 'teeth, bones, and no sun tanning' (photosensitivity)",
+                        "Anticholinergic toxidrome: 'Red as a beet, dry as a bone, blind as a bat, mad as a hatter, hot as a hare'",
+                        "Staph vs Strep: Staphylococci = clusters (grapes), Streptococci = chains",
+                        "Encapsulated bacteria: 'Some Killers Have Pretty Nice Capsules' (Strep pneumoniae, Klebsiella, H. influenzae, Pseudomonas, Neisseria, Cryptococcus)",
+                        "Atypical pneumonia bugs: 'Legionnaires Don't Chase Mycoplasma' (Legionella, Chlamydophila, Mycoplasma)",
+                        "Hypersensitivity types: ACID (type 1 Anaphylactic, 2 Cytotoxic, 3 Immune complex, 4 Delayed)"
+                    ),
+                    tip("Write your own versions - a mnemonic you invent is remembered far better than one you borrow.")
+                )
+            )
+        )
+    )
+
+    // ------------------------------------------------------------------
+    // 11. Emergencies
+    // ------------------------------------------------------------------
+    private val emergenciesSection = Section(
+        id = "emergencies",
+        title = "Emergency Quick Reference",
+        description = "Recognition and first steps for common emergencies",
+        topics = listOf(
+            Topic(
+                id = "emergency-abcde",
+                title = "The ABCDE Approach",
+                summary = "The universal framework for any deteriorating patient.",
+                blocks = listOf(
+                    p("Used for ANY acutely unwell patient. Treat life threats at each step before moving on, and reassess from A after every intervention. Students: recognise, call for help early, and assist - always under supervision."),
+                    b(
+                        "A - Airway: talking = patent airway. Look for obstruction, stridor, secretions. Call for help; basic manoeuvres (head-tilt chin-lift), suction, airway adjuncts per training.",
+                        "B - Breathing: rate, effort, SpO2, symmetry, trachea, auscultation. Sit up, oxygen per protocol, look for tension pneumothorax, severe asthma, pulmonary oedema.",
+                        "C - Circulation: pulse, BP, capillary refill, JVP, heart sounds, urine output. IV access, bloods, fluids or blood per cause - think shock types.",
+                        "D - Disability: AVPU/GCS, pupils, glucose (ALWAYS check glucose), lateralising signs.",
+                        "E - Exposure: temperature, rashes (non-blanching?), abdomen, calves, drains and lines - preserve dignity and warmth."
+                    ),
+                    tip("Say your ABCDE out loud in OSCEs and simulations - it structures your actions AND earns the marks.")
+                )
+            ),
+            Topic(
+                id = "emergency-recognition",
+                title = "Recognising the Big Emergencies",
+                summary = "Pattern recognition for MI, stroke, sepsis, anaphylaxis and DKA.",
+                blocks = listOf(
+                    b(
+                        "STEMI: crushing central chest pain, radiation to jaw/arm, sweating, ST elevation on ECG - emergency cath lab pathway, time is muscle.",
+                        "Stroke: FAST positive, sudden deficit - note LAST KNOWN WELL time, check glucose, urgent non-contrast CT.",
+                        "Sepsis: infection + confusion, fast breathing, low BP, mottled skin, low urine output - escalate immediately; sepsis bundles save lives.",
+                        "Anaphylaxis: sudden airway swelling, wheeze, hypotension, urticaria after exposure - IM adrenaline into anterolateral thigh is FIRST line.",
+                        "DKA: hyperglycaemia, ketones, Kussmaul breathing, dehydration, abdominal pain - fluids first, then insulin per protocol with potassium monitoring.",
+                        "Meningitis: fever, headache, neck stiffness, photophobia, non-blanching rash - do not delay antibiotics for investigations.",
+                        "Pulmonary embolism: sudden dyspnoea, pleuritic pain, tachycardia, risk factors (immobility, surgery, OCP) - Wells score and imaging pathway."
+                    ),
+                    tip("Your job as a student is RECOGNITION and ESCALATION. Know your hospital's emergency numbers before your first shift.")
+                )
+            ),
+            Topic(
+                id = "emergency-shock",
+                title = "Shock - The Four Types",
+                summary = "Low perfusion has four mechanisms; treatment differs for each.",
+                blocks = listOf(
+                    b(
+                        "Hypovolaemic: fluid/blood loss (haemorrhage, dehydration, burns). Cold peripheries, flat JVP. Replace volume, stop the loss.",
+                        "Cardiogenic: pump failure (MI, arrhythmia, tamponade physiology). Raised JVP, crackles. Fluids can worsen it - needs cardiology-level care.",
+                        "Obstructive: tension pneumothorax, tamponade, massive PE. Raised JVP with clear-ish lungs. Relieve the obstruction - needle/finger decompression, drainage per protocol.",
+                        "Distributive: sepsis, anaphylaxis, neurogenic. Warm peripheries early, wide pulse pressure. Treat cause; vasopressors when fluids fail."
+                    ),
+                    p("Bedside clues that separate them: JVP (flat vs raised), lung fields (wet vs clear), skin (cold vs warm), and the story. Ultrasound in trained hands confirms quickly."),
+                    tip("Hypotension is a LATE sign of shock, especially in young patients. Tachycardia, narrow pulse pressure and confusion come first.")
+                )
+            )
+        )
+    )
+
     // Declared last: object properties initialize in declaration order, so the
     // aggregate lists must come after all the private section vals above.
     val sections: List<Section> = listOf(
@@ -884,7 +1009,9 @@ object Handbook {
         examsSection,
         ethicsSection,
         wellbeingSection,
-        resourcesSection
+        resourcesSection,
+        mnemonicsSection,
+        emergenciesSection
     )
 
     val allTopics: List<Topic> = sections.flatMap { it.topics }

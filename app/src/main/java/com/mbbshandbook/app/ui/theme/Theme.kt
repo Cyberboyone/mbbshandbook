@@ -61,6 +61,7 @@ fun MbbsHandbookTheme(
 ) {
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
+        typography = MbbsTypography,
         content = content
     )
 }

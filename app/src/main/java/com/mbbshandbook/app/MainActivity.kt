@@ -4,11 +4,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mbbshandbook.app.ui.BookmarksScreen
+import com.mbbshandbook.app.ui.CalculatorHomeScreen
+import com.mbbshandbook.app.ui.CalculatorScreen
+import com.mbbshandbook.app.ui.FlashcardHomeScreen
+import com.mbbshandbook.app.ui.FlashcardPlayScreen
+import com.mbbshandbook.app.ui.GlossaryScreen
 import com.mbbshandbook.app.ui.HomeScreen
+import com.mbbshandbook.app.ui.QuizHomeScreen
+import com.mbbshandbook.app.ui.QuizPlayScreen
 import com.mbbshandbook.app.ui.SearchScreen
 import com.mbbshandbook.app.ui.SectionScreen
 import com.mbbshandbook.app.ui.TopicScreen
@@ -18,16 +30,33 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Bookmarks.init(this)
+        Progress.init(this)
+        QuizScores.init(this)
         enableEdgeToEdge()
         setContent {
             MbbsHandbookTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "home") {
+                NavHost(
+                    navController = navController,
+                    startDestination = "home",
+                    enterTransition = {
+                        slideInHorizontally(tween(280)) { it / 4 } + fadeIn(tween(280))
+                    },
+                    exitTransition = { fadeOut(tween(200)) },
+                    popEnterTransition = { fadeIn(tween(200)) },
+                    popExitTransition = {
+                        slideOutHorizontally(tween(280)) { it / 4 } + fadeOut(tween(280))
+                    }
+                ) {
                     composable("home") {
                         HomeScreen(
                             onSectionClick = { navController.navigate("section/$it") },
                             onSearchClick = { navController.navigate("search") },
-                            onBookmarksClick = { navController.navigate("bookmarks") }
+                            onBookmarksClick = { navController.navigate("bookmarks") },
+                            onQuizClick = { navController.navigate("quiz") },
+                            onFlashcardsClick = { navController.navigate("flashcards") },
+                            onCalculatorsClick = { navController.navigate("calculators") },
+                            onGlossaryClick = { navController.navigate("glossary") }
                         )
                     }
                     composable("section/{sectionId}") { entry ->
@@ -56,6 +85,45 @@ class MainActivity : ComponentActivity() {
                             onTopicClick = { navController.navigate("topic/$it") },
                             onBack = { navController.popBackStack() }
                         )
+                    }
+                    composable("quiz") {
+                        QuizHomeScreen(
+                            onCategoryClick = { navController.navigate("quiz/$it") },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("quiz/{categoryId}") { entry ->
+                        QuizPlayScreen(
+                            categoryId = entry.arguments?.getString("categoryId").orEmpty(),
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("flashcards") {
+                        FlashcardHomeScreen(
+                            onDeckClick = { navController.navigate("flashcards/$it") },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("flashcards/{deckId}") { entry ->
+                        FlashcardPlayScreen(
+                            deckId = entry.arguments?.getString("deckId").orEmpty(),
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("calculators") {
+                        CalculatorHomeScreen(
+                            onCalcClick = { navController.navigate("calculators/$it") },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("calculators/{calcId}") { entry ->
+                        CalculatorScreen(
+                            calcId = entry.arguments?.getString("calcId").orEmpty(),
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("glossary") {
+                        GlossaryScreen(onBack = { navController.popBackStack() })
                     }
                 }
             }

@@ -2,7 +2,6 @@ package com.mbbshandbook.app.ui
 
 import android.content.Intent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,24 +24,30 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.LocalLibrary
+import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,16 +55,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.Bookmarks
+import com.mbbshandbook.app.Progress
 import com.mbbshandbook.app.data.ContentBlock
 import com.mbbshandbook.app.data.Handbook
 import com.mbbshandbook.app.data.Section
 import com.mbbshandbook.app.data.Topic
 
-private val sectionEmojis = mapOf(
+internal val sectionEmojis = mapOf(
     "start" to "🧭",
     "preclinical" to "🔬",
     "paraclinical" to "🧫",
@@ -68,7 +79,9 @@ private val sectionEmojis = mapOf(
     "exams" to "📝",
     "ethics" to "⚖️",
     "wellbeing" to "🌿",
-    "resources" to "📚"
+    "resources" to "📚",
+    "mnemonics" to "🧠",
+    "emergencies" to "🚨"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,8 +89,15 @@ private val sectionEmojis = mapOf(
 fun HomeScreen(
     onSectionClick: (String) -> Unit,
     onSearchClick: () -> Unit,
-    onBookmarksClick: () -> Unit
+    onBookmarksClick: () -> Unit,
+    onQuizClick: () -> Unit,
+    onFlashcardsClick: () -> Unit,
+    onCalculatorsClick: () -> Unit,
+    onGlossaryClick: () -> Unit
 ) {
+    val percent = Progress.percent()
+    val readCount = Progress.readIds.count { id -> Handbook.allTopics.any { it.id == id } }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -102,32 +122,106 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // ---- Hero ----
             item {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(Modifier.padding(20.dp)) {
+                Box {
+                    BannerImage(res = com.mbbshandbook.app.R.drawable.hero, height = 210.dp)
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(18.dp)
+                    ) {
+                        Text(
+                            "MBBS Students\nHandbook",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = Color.White
+                        )
                         Text(
                             "Your pocket companion through medical school",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(Modifier.height(6.dp))
-                        Text(
-                            "${Handbook.sections.size} sections · ${Handbook.allTopics.size} topics · works offline",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.85f)
                         )
                     }
                 }
             }
+
+            // ---- Progress ----
+            item {
+                Card(
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                "📈 Your progress",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                "$percent%",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(Modifier.height(10.dp))
+                        LinearProgressIndicator(
+                            progress = { percent / 100f },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            strokeCap = StrokeCap.Round
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            "$readCount of ${Handbook.allTopics.size} topics read · ${Handbook.sections.size} sections",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+
+            // ---- Study tools ----
+            item {
+                Text(
+                    "Study Tools",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ToolCard("Quizzes", "Test yourself", Icons.Filled.Quiz,
+                        listOf(Color(0xFF7B1FA2), Color(0xFFBA68C8)), Modifier.weight(1f), onQuizClick)
+                    ToolCard("Flashcards", "Flip & recall", Icons.Filled.Style,
+                        listOf(Color(0xFF1565C0), Color(0xFF64B5F6)), Modifier.weight(1f), onFlashcardsClick)
+                }
+            }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ToolCard("Calculators", "Clinical maths", Icons.Filled.Calculate,
+                        listOf(Color(0xFFC62828), Color(0xFFE57373)), Modifier.weight(1f), onCalculatorsClick)
+                    ToolCard("Glossary", "Med terms A-Z", Icons.Filled.LocalLibrary,
+                        listOf(Color(0xFF00695C), Color(0xFF4DB6AC)), Modifier.weight(1f), onGlossaryClick)
+                }
+            }
+
+            // ---- Sections ----
+            item {
+                Text(
+                    "Handbook",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
             items(Handbook.sections, key = { it.id }) { section ->
-                SectionCard(section = section, onClick = { onSectionClick(section.id) })
+                SectionBannerCard(section = section, onClick = { onSectionClick(section.id) })
             }
             item {
                 Text(
@@ -143,54 +237,104 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SectionCard(section: Section, onClick: () -> Unit) {
+private fun ToolCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    gradient: List<Color>,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        modifier = modifier,
+        shape = RoundedCornerShape(18.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            Modifier
+                .background(Brush.linearGradient(gradient))
+                .padding(16.dp)
         ) {
+            Column {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.22f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(icon, contentDescription = null, tint = Color.White)
+                }
+                Spacer(Modifier.height(10.dp))
+                Text(title, style = MaterialTheme.typography.titleSmall, color = Color.White)
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.85f)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SectionBannerCard(section: Section, onClick: () -> Unit) {
+    val readIn = section.topics.count { Progress.isRead(it.id) }
+    Card(
+        onClick = onClick,
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Box {
+            BannerImage(res = sectionBanner(section.id), height = 130.dp, cornerRadius = 0.dp)
             Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
+                    .align(Alignment.TopEnd)
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(
+                        Brush.linearGradient(sectionGradient(section.id))
+                    )
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    if (readIn == section.topics.size) "✓ complete" else "$readIn/${section.topics.size} read",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     sectionEmojis[section.id] ?: "📖",
-                    style = MaterialTheme.typography.titleLarge
+                    fontSize = 26.sp
+                )
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        section.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Text(
+                        section.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 1
+                    )
+                }
+                Icon(
+                    Icons.Filled.ChevronRight,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.9f)
                 )
             }
-            Spacer(Modifier.width(16.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    section.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    section.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    "${section.topics.size} topics",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            Icon(
-                Icons.Filled.ChevronRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
@@ -225,6 +369,28 @@ fun SectionScreen(sectionId: String, onTopicClick: (String) -> Unit, onBack: () 
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
+                item {
+                    Box {
+                        BannerImage(res = sectionBanner(section.id), height = 150.dp)
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                "${sectionEmojis[section.id] ?: "📖"} ${section.title}",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = Color.White
+                            )
+                            Text(
+                                section.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.85f)
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                }
                 items(section.topics, key = { it.id }) { topic ->
                     TopicRow(topic = topic, onClick = { onTopicClick(topic.id) })
                 }
@@ -235,36 +401,48 @@ fun SectionScreen(sectionId: String, onTopicClick: (String) -> Unit, onBack: () 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopicRow(topic: Topic, onClick: () -> Unit) {
+internal fun TopicRow(topic: Topic, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     topic.title,
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    fontWeight = FontWeight.SemiBold
                 )
-                if (Bookmarks.contains(topic.id)) {
-                    Icon(
-                        Icons.Filled.Bookmark,
-                        contentDescription = "Bookmarked",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    topic.summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-            Spacer(Modifier.height(4.dp))
-            Text(
-                topic.summary,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Spacer(Modifier.width(8.dp))
+            if (Progress.isRead(topic.id)) {
+                Icon(
+                    Icons.Filled.CheckCircle,
+                    contentDescription = "Read",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+            }
+            if (Bookmarks.contains(topic.id)) {
+                Icon(
+                    Icons.Filled.Bookmark,
+                    contentDescription = "Bookmarked",
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }
@@ -276,6 +454,10 @@ fun TopicScreen(topicId: String, onBack: () -> Unit) {
     val section = Handbook.sectionForTopic(topicId)
     val context = LocalContext.current
     val isBookmarked = Bookmarks.contains(topicId)
+
+    LaunchedEffect(topicId) {
+        if (topic != null) Progress.markRead(topicId)
+    }
 
     Scaffold(
         topBar = {
@@ -338,14 +520,16 @@ fun TopicScreen(topicId: String, onBack: () -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp)
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
                 item {
+                    BannerImage(res = sectionBanner(section?.id ?: ""), height = 140.dp)
+                    Spacer(Modifier.height(14.dp))
                     Text(
                         topic.title,
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 8.dp)
+                        fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
@@ -534,7 +718,7 @@ fun BookmarksScreen(onTopicClick: (String) -> Unit, onBack: () -> Unit) {
 }
 
 @Composable
-private fun EmptyState(message: String, padding: PaddingValues) {
+internal fun EmptyState(message: String, padding: PaddingValues) {
     Box(
         modifier = Modifier
             .fillMaxSize()

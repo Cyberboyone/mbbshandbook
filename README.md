@@ -1,20 +1,38 @@
 # MBBS Students Handbook 📱🩺
 
-An offline Android handbook for MBBS students — study strategies for every phase of
-medical school, clinical skills checklists, exam technique, ethics, wellbeing and
-career guidance.
+A beautiful, offline-first Android handbook for MBBS students — study strategies for
+every phase of medical school, clinical skills, exam technique, ethics, wellbeing,
+plus interactive study tools.
 
-Built with **Kotlin + Jetpack Compose (Material 3)**. All content ships inside the
-app: no account, no internet, no tracking.
+Built with **Kotlin + Jetpack Compose (Material 3)**, custom **Poppins** typography,
+gradient UI, illustrated banners, and animated transitions. No account, no internet,
+no tracking.
 
-## App features
+## ✨ Features
 
-- **9 sections, 30+ topics** — getting started, preclinical, paraclinical, clinical
-  rotations, clinical skills, exam success, ethics, wellbeing, resources & career
+### 📖 Handbook — 11 sections, 37+ topics
+Getting started · Preclinical · Paraclinical · Clinical rotations · Clinical skills ·
+Exam success · Ethics · Wellbeing · Resources & career · **Mnemonics vault** ·
+**Emergency quick reference** — each section with its own illustrated banner and
+gradient theme.
+
+### 🎯 Interactive study tools
+- **Quizzes** — 48 MCQs across 6 categories (Anatomy, Physiology, Pharmacology,
+  Micro & Path, Clinical Medicine, Ethics & Skills) with instant feedback,
+  explanations, shuffled replays, saved best scores and a confetti celebration 🎉
+- **Flashcards** — 48 cards in 4 decks (Cranial Nerves, Normal Values, Antidotes,
+  Clinical Vocabulary) with a 3D flip animation and shuffle
+- **Clinical calculators** — BMI, IV drip rate + pump rate, maintenance fluids
+  (4-2-1), Glasgow Coma Scale, APGAR — all unit-tested
+- **Medical glossary** — 45 searchable terms A-Z
+
+### 🧭 Reading experience
+- **Progress tracking** — topics auto-mark as read; per-section and overall
+  progress shown on the home screen
 - **Full-text search** across every topic
 - **Bookmarks** saved on-device
-- **Share** any topic as text with coursemates
-- **Dark mode** follows the system theme
+- **Share** any topic as text
+- **Dark mode** + edge-to-edge design, animated navigation
 - Works fully **offline** (min Android 7.0 / API 24)
 
 > ⚠️ Educational guidance for students — not medical advice. Always follow your
@@ -81,23 +99,29 @@ Install the debug APK on a connected device: `adb install app/build/outputs/apk/
 
 ```
 app/src/main/java/com/mbbshandbook/app/
-├── MainActivity.kt          # navigation host
-├── Bookmarks.kt             # persistent bookmarks (SharedPreferences)
+├── MainActivity.kt          # navigation host with animated transitions
+├── Bookmarks.kt             # persistent bookmarks
+├── Progress.kt              # reading progress + best quiz scores
 ├── data/
 │   ├── Model.kt             # Section / Topic / ContentBlock
-│   └── HandbookData.kt      # ALL handbook content — edit here
+│   ├── HandbookData.kt      # ALL handbook content — edit here
+│   └── StudyTools.kt        # quizzes, flashcards, glossary — edit here
+├── logic/
+│   └── Calculators.kt       # pure, unit-tested clinical calculators
 └── ui/
     ├── Screens.kt           # home, section, topic, search, bookmarks
-    └── theme/Theme.kt       # Material 3 green light/dark schemes
+    ├── StudyScreens.kt      # quizzes, flashcards, calculators, glossary
+    ├── Visuals.kt           # banner art + per-section gradients
+    └── theme/               # Material 3 schemes + Poppins typography
 ```
 
-To add or edit content, change `HandbookData.kt` — topics are plain Kotlin data
-(`Heading`, `Paragraph`, `Bullets`, `Tip` blocks) and unit tests verify IDs are
-unique and nothing is empty.
+Illustrated banners live in `res/drawable-nodpi/` (optimized WebP).
+To add or edit content, change `HandbookData.kt` / `StudyTools.kt` — plain Kotlin
+data, with unit tests verifying IDs, quiz validity and calculator maths.
 
 ## Tech stack
 
 - Kotlin 2.0, Jetpack Compose (BOM 2024.09), Material 3
-- Navigation Compose, AndroidX Activity (edge-to-edge)
+- Navigation Compose (animated transitions), AndroidX Activity (edge-to-edge)
 - AGP 8.6, Gradle 8.9, JDK 17 · minSdk 24 · targetSdk 35
 - R8 minification + resource shrinking for release builds
