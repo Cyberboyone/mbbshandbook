@@ -1,14 +1,16 @@
 package com.mbbshandbook.app
 
 import android.content.Context
-import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.mutableStateListOf
 
 /** Tiny persistent bookmark store backed by SharedPreferences. */
 object Bookmarks {
     private const val PREFS = "bookmarks"
     private const val KEY = "topic_ids"
 
-    val ids = mutableStateSetOf<String>()
+    // SnapshotStateList (observable). Kept duplicate-free by toggle()/init(),
+    // so it behaves as a set; mutableStateSetOf needs Compose 1.8+.
+    val ids = mutableStateListOf<String>()
     private var prefs: android.content.SharedPreferences? = null
 
     fun init(context: Context) {
