@@ -17,18 +17,6 @@ private fun tip(text: String) = Tip(text)
  */
 object Handbook {
 
-    val sections: List<Section> = listOf(
-        startSection,
-        preclinicalSection,
-        paraclinicalSection,
-        clinicalSection,
-        skillsSection,
-        examsSection,
-        ethicsSection,
-        wellbeingSection,
-        resourcesSection
-    )
-
     fun sectionById(id: String): Section? = sections.firstOrNull { it.id == id }
 
     fun topicById(id: String): Topic? =
@@ -36,8 +24,6 @@ object Handbook {
 
     fun sectionForTopic(topicId: String): Section? =
         sections.firstOrNull { section -> section.topics.any { it.id == topicId } }
-
-    val allTopics: List<Topic> = sections.flatMap { it.topics }
 
     fun search(query: String): List<Topic> {
         val q = query.trim().lowercase()
@@ -886,4 +872,20 @@ object Handbook {
             )
         )
     )
+
+    // Declared last: object properties initialize in declaration order, so the
+    // aggregate lists must come after all the private section vals above.
+    val sections: List<Section> = listOf(
+        startSection,
+        preclinicalSection,
+        paraclinicalSection,
+        clinicalSection,
+        skillsSection,
+        examsSection,
+        ethicsSection,
+        wellbeingSection,
+        resourcesSection
+    )
+
+    val allTopics: List<Topic> = sections.flatMap { it.topics }
 }
