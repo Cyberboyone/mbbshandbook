@@ -762,6 +762,7 @@ private fun BmiCalc() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DripCalc() {
     var volume by remember { mutableStateOf("") }
