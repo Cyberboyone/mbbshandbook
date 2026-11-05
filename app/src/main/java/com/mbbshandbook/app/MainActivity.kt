@@ -12,6 +12,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mbbshandbook.app.ads.AdsController
 import com.mbbshandbook.app.ui.BookmarksScreen
 import com.mbbshandbook.app.ui.CalculatorHomeScreen
 import com.mbbshandbook.app.ui.CalculatorScreen
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
         Progress.init(this)
         QuizScores.init(this)
         enableEdgeToEdge()
+        AdsController.start(this)
         setContent {
             MbbsHandbookTheme {
                 val navController = rememberNavController()

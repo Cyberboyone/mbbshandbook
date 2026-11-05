@@ -64,7 +64,7 @@ fun SpecialtiesScreen(onSpecialtyClick: (String) -> Unit, onBack: () -> Unit) {
     val results = remember(query) { Specialties.search(query) }
     val grouped = remember(results) { results.groupBy { it.category } }
 
-    ToolScaffold("Specialties & Roadmaps", onBack) { padding ->
+    ToolScaffold("Specialties & Roadmaps", onBack, showTestAd = true) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

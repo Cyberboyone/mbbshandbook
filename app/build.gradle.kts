@@ -8,14 +8,14 @@ plugins {
 
 android {
     namespace = "com.mbbshandbook.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.mbbshandbook.app"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 2
-        versionName = "1.1.0"
+        targetSdk = 36
+        versionCode = 3
+        versionName = "1.2.0"
     }
 
     signingConfigs {
@@ -66,6 +66,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -76,6 +77,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
     testImplementation(libs.junit)
     debugImplementation(libs.androidx.ui.tooling)
 }

@@ -1,0 +1,88 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M24,0 H84 A24,24 0 0 1 108,24 V84 A24,24 0 0 1 84,108 H24 A24,24 0 0 1 0,84 V24 A24,24 0 0 1 24,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:startX="0" android:startY="0" android:endX="108" android:endY="108" android:type="linear">
+                <item android:offset="0" android:color="#FF0B6E4F" />
+                <item android:offset="1" android:color="#FF148F63" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+
+    <!-- Open book -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,46 C46,39 34,36 24,38 L24,74 C34,72 46,75 54,82 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,46 C62,39 74,36 84,38 L84,74 C74,72 62,75 54,82 Z" />
+    <path
+        android:strokeColor="#9FD8C3"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M54,46 L54,82" />
+    <path
+        android:strokeColor="#9FD8C3"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M30,49 C37,48 45,50 50,53" />
+    <path
+        android:strokeColor="#9FD8C3"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M30,58 C37,57 45,59 50,62" />
+    <path
+        android:strokeColor="#9FD8C3"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M30,67 C37,66 45,68 50,71" />
+    <path
+        android:strokeColor="#9FD8C3"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M58,53 C64,50 71,48 78,49" />
+    <path
+        android:strokeColor="#9FD8C3"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M58,62 C64,59 71,57 78,58" />
+
+    <!-- Stethoscope resting on the book -->
+    <path
+        android:strokeColor="#0B3B2E"
+        android:strokeWidth="3.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M38,27 L38,40 C38,48 44,53 52,53" />
+    <path
+        android:strokeColor="#0B3B2E"
+        android:strokeWidth="3.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M68,27 L68,40 C68,48 62,53 52,53" />
+    <path
+        android:strokeColor="#0B3B2E"
+        android:strokeWidth="3.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M52,53 C52,64 58,70 66,70 C72,70 76,66 76,61" />
+    <path
+        android:fillColor="#F4B942"
+        android:pathData="M38,23 A3,3 0 1,1 38,29 A3,3 0 1,1 38,23 Z" />
+    <path
+        android:fillColor="#F4B942"
+        android:pathData="M68,23 A3,3 0 1,1 68,29 A3,3 0 1,1 68,23 Z" />
+    <path
+        android:fillColor="#F4B942"
+        android:strokeColor="#0B3B2E"
+        android:strokeWidth="2"
+        android:pathData="M76,51.5 A6.5,6.5 0 1,1 76,64.5 A6.5,6.5 0 1,1 76,51.5 Z" />
+    <path
+        android:fillColor="#0B3B2E"
+        android:pathData="M76,55.5 A2.5,2.5 0 1,1 76,60.5 A2.5,2.5 0 1,1 76,55.5 Z" />
+</vector>
