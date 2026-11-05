@@ -35,7 +35,9 @@ data class GlossaryEntry(val term: String, val definition: String)
 
 object StudyTools {
 
-    val quizCategories: List<QuizCategory> = listOf(
+    // Base questions; the expanded bank (QuizBank + quizBankNewCategories)
+    // is merged into the public quizCategories below.
+    private val baseQuizCategories: List<QuizCategory> = listOf(
         QuizCategory(
             id = "anatomy", title = "Anatomy", emoji = "🦴",
             questions = listOf(
@@ -356,6 +358,12 @@ object StudyTools {
         )
     )
 
+    /** Expanded quiz bank: base questions + extras + new categories. */
+    val quizCategories: List<QuizCategory> =
+        baseQuizCategories.map { cat ->
+            cat.copy(questions = cat.questions + QuizBank.extraQuestions(cat.id))
+        } + quizBankNewCategories
+
     val flashcardDecks: List<FlashcardDeck> = listOf(
         FlashcardDeck(
             id = "cranial-nerves", title = "Cranial Nerves", emoji = "🧠",
@@ -424,6 +432,36 @@ object StudyTools {
                 Flashcard("Clubbing", "Loss of nail-fold angle, bulbous fingertips - think chronic hypoxia, lung cancer, IBD, endocarditis"),
                 Flashcard("Ascites", "Fluid in the peritoneal cavity - shifting dullness, fluid thrill")
             )
+        ),
+        FlashcardDeck(
+            id = "paeds-milestones", title = "Paeds Milestones", emoji = "🧸",
+            cards = listOf(
+                Flashcard("2 months", "Social smile, lifts head in prone, follows past midline"),
+                Flashcard("4 months", "Rolls over, laughs aloud, reaches for objects, no head lag"),
+                Flashcard("6 months", "Sits with support, transfers objects, babbles, palmar grasp"),
+                Flashcard("9 months", "Sits unsupported, crawls, pincer grasp, stranger anxiety, 'mama/dada' non-specific"),
+                Flashcard("12 months", "Stands/walks with help, 1-2 words with meaning, points, waves"),
+                Flashcard("18 months", "Walks well, ~10 words, scribbles, uses spoon, points to body parts"),
+                Flashcard("2 years", "Runs, 2-word sentences, parallel play, builds tower of 6 cubes"),
+                Flashcard("3 years", "Tricycle, 3-word sentences, knows name/age, copies a circle"),
+                Flashcard("Weight rules of thumb", "~3.5 kg at birth; doubles by 4-5 months; triples by 1 year"),
+                Flashcard("Red flags", "No smile by 3 months, no sitting by 9 months, no words by 18 months - refer")
+            )
+        ),
+        FlashcardDeck(
+            id = "obgyn-emergencies", title = "O&G Emergencies", emoji = "🤰",
+            cards = listOf(
+                Flashcard("PPH definition", "≥500 mL blood loss after vaginal birth (≥1000 mL after caesarean), or any loss causing compromise"),
+                Flashcard("PPH 4 Ts", "Tone (atony, ~70%), Tissue (retained placenta), Trauma (lacerations), Thrombin (coagulopathy)"),
+                Flashcard("First steps in atonic PPH", "Uterine massage, uterotonics (oxytocin/ergometrine/misoprostol), tranexamic acid, call for help"),
+                Flashcard("Eclampsia treatment", "Magnesium sulphate: 4 g IV loading + 1 g/hr infusion; monitor reflexes/respiration; calcium gluconate for toxicity"),
+                Flashcard("Shoulder dystocia first move", "McRoberts manoeuvre + suprapubic pressure. NEVER fundal pressure"),
+                Flashcard("HELPERR", "Help, Episiotomy evaluation, Legs (McRoberts), suprapubic Pressure, Enter manoeuvres, Remove posterior arm, Roll to all-fours"),
+                Flashcard("Ectopic triad", "Amenorrhoea + unilateral abdominal pain + vaginal bleeding; rupture = shoulder-tip pain + shock"),
+                Flashcard("Pre-eclampsia", "New hypertension ≥140/90 after 20 weeks + proteinuria or organ dysfunction"),
+                Flashcard("Anti-D timing", "~28 weeks antenatally + within 72 h of delivery if baby Rh-positive + after sensitising events"),
+                Flashcard("Cord prolapse", "Elevate presenting part, knee-chest/left lateral with head down, urgent delivery - usually caesarean")
+            )
         )
     )
 
@@ -472,6 +510,25 @@ object StudyTools {
         GlossaryEntry("Tachypnoea", "Respiratory rate above 20 breaths/min in adults."),
         GlossaryEntry("Triage", "Prioritising patients by urgency of need."),
         GlossaryEntry("Vertigo", "Illusion of movement/spinning - vestibular problem, not simple dizziness."),
-        GlossaryEntry("Wheeze", "Whistling expiratory sound from narrowed airways - asthma, COPD.")
+        GlossaryEntry("Wheeze", "Whistling expiratory sound from narrowed airways - asthma, COPD."),
+        GlossaryEntry("Akathisia", "Inner restlessness with inability to sit still - a distressing antipsychotic side effect."),
+        GlossaryEntry("Anion gap", "Na+ minus (Cl- + HCO3-); raised in lactic acidosis, ketoacidosis, renal failure and toxins."),
+        GlossaryEntry("Atony", "Loss of muscle tone - uterine atony is the commonest cause of postpartum haemorrhage."),
+        GlossaryEntry("Bronchiolitis", "Viral lower respiratory infection of infants (usually RSV): wheeze, crackles, feeding difficulty."),
+        GlossaryEntry("Chaperone", "An impartial observer present during intimate examinations - offer to all patients."),
+        GlossaryEntry("Delirium", "Acute, fluctuating disturbance of attention and awareness - always seek a medical cause."),
+        GlossaryEntry("Dysdiadochokinesia", "Impaired rapid alternating movements - a cerebellar sign."),
+        GlossaryEntry("Eclampsia", "Seizures in pre-eclampsia; treated with magnesium sulphate."),
+        GlossaryEntry("Gravidity / Parity", "Gravidity = number of pregnancies; parity = number of births beyond viability."),
+        GlossaryEntry("Haematemesis / Melaena", "Vomiting blood / black tarry stool - both suggest upper GI bleeding."),
+        GlossaryEntry("Intussusception", "Telescoping of bowel into itself; colicky pain, redcurrant-jelly stool, sausage-shaped mass."),
+        GlossaryEntry("Koplik spots", "White spots on buccal mucosa - pathognomonic early sign of measles."),
+        GlossaryEntry("McBurney's point", "One-third from ASIS to umbilicus; maximal tenderness in appendicitis."),
+        GlossaryEntry("Nystagmus", "Involuntary rhythmic eye movements - vestibular, cerebellar or drug-related."),
+        GlossaryEntry("Pica", "Craving non-food substances (ice, soil) - classic in iron deficiency."),
+        GlossaryEntry("Safety-netting", "Explicit advice on warning signs and when/how to seek help if things worsen."),
+        GlossaryEntry("Tardive dyskinesia", "Late-onset involuntary movements (often orofacial) from prolonged dopamine blockade."),
+        GlossaryEntry("Toxidrome", "A constellation of signs pointing to a class of poisoning (opioid, cholinergic, anticholinergic…)."),
+        GlossaryEntry("Uterine inversion", "The uterus turns inside out after delivery - rare, dramatic PPH cause; immediate senior help.")
     ).sortedBy { it.term.lowercase() }
 }

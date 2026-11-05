@@ -23,6 +23,8 @@ import com.mbbshandbook.app.ui.QuizHomeScreen
 import com.mbbshandbook.app.ui.QuizPlayScreen
 import com.mbbshandbook.app.ui.SearchScreen
 import com.mbbshandbook.app.ui.SectionScreen
+import com.mbbshandbook.app.ui.SpecialtiesScreen
+import com.mbbshandbook.app.ui.SpecialtyDetailScreen
 import com.mbbshandbook.app.ui.TopicScreen
 import com.mbbshandbook.app.ui.theme.MbbsHandbookTheme
 
@@ -56,7 +58,20 @@ class MainActivity : ComponentActivity() {
                             onQuizClick = { navController.navigate("quiz") },
                             onFlashcardsClick = { navController.navigate("flashcards") },
                             onCalculatorsClick = { navController.navigate("calculators") },
-                            onGlossaryClick = { navController.navigate("glossary") }
+                            onGlossaryClick = { navController.navigate("glossary") },
+                            onSpecialtiesClick = { navController.navigate("specialties") }
+                        )
+                    }
+                    composable("specialties") {
+                        SpecialtiesScreen(
+                            onSpecialtyClick = { navController.navigate("specialties/$it") },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("specialties/{specialtyId}") { entry ->
+                        SpecialtyDetailScreen(
+                            specialtyId = entry.arguments?.getString("specialtyId").orEmpty(),
+                            onBack = { navController.popBackStack() }
                         )
                     }
                     composable("section/{sectionId}") { entry ->

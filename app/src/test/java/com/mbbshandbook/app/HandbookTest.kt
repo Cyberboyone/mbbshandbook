@@ -53,4 +53,22 @@ class HandbookTest {
         assertTrue(Handbook.search("").isEmpty())
         assertTrue(Handbook.search("zzz-no-such-term-zzz").isEmpty())
     }
+
+    @Test
+    fun `expanded content is present`() {
+        assertTrue("Expected at least 60 topics", Handbook.allTopics.size >= 60)
+        assertNotNull(Handbook.topicById("ecg-basics"))
+        assertNotNull(Handbook.topicById("abg-interpretation"))
+        assertNotNull(Handbook.topicById("breaking-bad-news"))
+        assertNotNull(Handbook.topicById("emergency-drug-doses"))
+        assertNotNull(Handbook.topicById("lab-results"))
+        assertNotNull(Handbook.topicById("clinical-etiquette"))
+    }
+
+    @Test
+    fun `search covers new topics`() {
+        assertTrue(Handbook.search("SPIKES").any { it.id == "breaking-bad-news" })
+        assertTrue(Handbook.search("anion gap").isNotEmpty())
+        assertTrue(Handbook.search("SBAR").isNotEmpty())
+    }
 }

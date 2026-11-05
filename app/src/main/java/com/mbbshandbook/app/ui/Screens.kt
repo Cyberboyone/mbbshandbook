@@ -93,7 +93,8 @@ fun HomeScreen(
     onQuizClick: () -> Unit,
     onFlashcardsClick: () -> Unit,
     onCalculatorsClick: () -> Unit,
-    onGlossaryClick: () -> Unit
+    onGlossaryClick: () -> Unit,
+    onSpecialtiesClick: () -> Unit
 ) {
     val percent = Progress.percent()
     val readCount = Progress.readIds.count { id -> Handbook.allTopics.any { it.id == id } }
@@ -212,6 +213,11 @@ fun HomeScreen(
                 }
             }
 
+            // ---- Specialties feature ----
+            item {
+                SpecialtiesFeatureCard(onClick = onSpecialtiesClick)
+            }
+
             // ---- Sections ----
             item {
                 Text(
@@ -272,6 +278,48 @@ private fun ToolCard(
                     subtitle,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.85f)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SpecialtiesFeatureCard(onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        shape = RoundedCornerShape(18.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Box(
+            Modifier
+                .background(
+                    Brush.linearGradient(
+                        listOf(Color(0xFF4527A0), Color(0xFF7E57C2), Color(0xFFB39DDB))
+                    )
+                )
+                .padding(18.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("🩺", fontSize = 34.sp)
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "Specialties & Roadmaps",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Text(
+                        "${com.mbbshandbook.app.data.Specialties.all.size} careers · training paths · exams · lifestyle",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.88f)
+                    )
+                }
+                Icon(
+                    Icons.Filled.ChevronRight,
+                    contentDescription = null,
+                    tint = Color.White
                 )
             }
         }

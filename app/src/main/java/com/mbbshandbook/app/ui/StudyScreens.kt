@@ -90,7 +90,7 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ToolScaffold(
+internal fun ToolScaffold(
     title: String,
     onBack: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
@@ -130,7 +130,7 @@ fun QuizHomeScreen(onCategoryClick: (String) -> Unit, onBack: () -> Unit) {
         ) {
             item {
                 Text(
-                    "Pick a category. ${StudyTools.quizCategories.sumOf { it.questions.size }} questions with explanations - best scores are saved.",
+                    "Pick a category. ${StudyTools.quizCategories.sumOf { it.questions.size }} questions with explanations - 12 random questions per round, best scores saved.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -206,7 +206,7 @@ fun QuizPlayScreen(categoryId: String, onBack: () -> Unit) {
     var finished by remember { mutableStateOf(false) }
     var round by remember { mutableIntStateOf(0) }
 
-    val questions = remember(round) { category.questions.shuffled() }
+    val questions = remember(round) { category.questions.shuffled().take(12) }
     val q = questions[index]
 
     ToolScaffold("${category.emoji} ${category.title}", onBack) { padding ->

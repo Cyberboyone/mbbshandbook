@@ -26,6 +26,20 @@ class StudyToolsTest {
     }
 
     @Test
+    fun `expanded quiz bank is present`() {
+        val total = StudyTools.quizCategories.sumOf { it.questions.size }
+        assertTrue("Expected at least 150 questions, got $total", total >= 150)
+        StudyTools.quizCategories.forEach { cat ->
+            assertTrue("${cat.id} has too few questions", cat.questions.size >= 12)
+        }
+        val ids = StudyTools.quizCategories.map { it.id }
+        assertTrue("paediatrics" in ids)
+        assertTrue("obgyn" in ids)
+        assertTrue("psychiatry" in ids)
+        assertTrue("emergency" in ids)
+    }
+
+    @Test
     fun `flashcard decks are valid`() {
         assertTrue(StudyTools.flashcardDecks.isNotEmpty())
         StudyTools.flashcardDecks.forEach { deck ->
