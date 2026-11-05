@@ -10,21 +10,32 @@ no tracking.
 
 ## ✨ Features
 
-### 📖 Handbook — 11 sections, 37+ topics
+### 📖 Handbook — 11 sections, 67 topics
 Getting started · Preclinical · Paraclinical · Clinical rotations · Clinical skills ·
 Exam success · Ethics · Wellbeing · Resources & career · **Mnemonics vault** ·
 **Emergency quick reference** — each section with its own illustrated banner and
-gradient theme.
+gradient theme. Includes ECG/CXR/ABG interpretation, lab patterns, ward calls,
+suturing, SBAR handover, breaking bad news, end-of-life care, emergency drug
+doses, trauma and poisoning.
+
+### 🩺 Specialties & Roadmaps
+18 specialties across Medical, Surgical and Acute/Diagnostic groups — each with
+what the work is really like, a day in the life, a visual **MBBS → internship →
+residency → fellowship roadmap**, key exams (WACP/NPMCN, MRCP/MRCS, USMLE routes),
+lifestyle & competitiveness notes, and "start now in med school" action steps.
+Searchable, with per-specialty gradient themes.
 
 ### 🎯 Interactive study tools
-- **Quizzes** — 48 MCQs across 6 categories (Anatomy, Physiology, Pharmacology,
-  Micro & Path, Clinical Medicine, Ethics & Skills) with instant feedback,
-  explanations, shuffled replays, saved best scores and a confetti celebration 🎉
-- **Flashcards** — 48 cards in 4 decks (Cranial Nerves, Normal Values, Antidotes,
-  Clinical Vocabulary) with a 3D flip animation and shuffle
+- **Quizzes** — 168 MCQs across 10 categories (Anatomy, Physiology, Pharmacology,
+  Micro & Path, Clinical Medicine, Ethics & Skills, **Paediatrics, OB/GYN,
+  Psychiatry, Emergency Medicine**) with instant feedback, explanations,
+  12-question shuffled rounds, saved best scores and a confetti celebration 🎉
+- **Flashcards** — 68 cards in 6 decks (Cranial Nerves, Normal Values, Antidotes,
+  Clinical Vocabulary, **Paeds Milestones, O&G Emergencies**) with a 3D flip
+  animation and shuffle
 - **Clinical calculators** — BMI, IV drip rate + pump rate, maintenance fluids
   (4-2-1), Glasgow Coma Scale, APGAR — all unit-tested
-- **Medical glossary** — 45 searchable terms A-Z
+- **Medical glossary** — 64 searchable terms A-Z
 
 ### 🧭 Reading experience
 - **Progress tracking** — topics auto-mark as read; per-section and overall
@@ -104,20 +115,26 @@ app/src/main/java/com/mbbshandbook/app/
 ├── Progress.kt              # reading progress + best quiz scores
 ├── data/
 │   ├── Model.kt             # Section / Topic / ContentBlock
-│   ├── HandbookData.kt      # ALL handbook content — edit here
-│   └── StudyTools.kt        # quizzes, flashcards, glossary — edit here
+│   ├── HandbookData.kt      # core handbook content
+│   ├── HandbookExtras.kt    # extra topics appended per section
+│   ├── StudyTools.kt        # quizzes, flashcards, glossary (base + merged bank)
+│   ├── QuizBank.kt          # extra questions for the base categories
+│   ├── QuizBankNew.kt       # Paeds / OB-GYN / Psychiatry / Emergency quizzes
+│   ├── Specialties.kt       # Specialty model + catalogue lookups
+│   ├── SpecialtiesMedical.kt / SpecialtiesProcedural.kt / SpecialtiesAcuteDx.kt
 ├── logic/
 │   └── Calculators.kt       # pure, unit-tested clinical calculators
 └── ui/
     ├── Screens.kt           # home, section, topic, search, bookmarks
     ├── StudyScreens.kt      # quizzes, flashcards, calculators, glossary
+    ├── SpecialtyScreens.kt  # specialty catalogue + roadmap detail
     ├── Visuals.kt           # banner art + per-section gradients
     └── theme/               # Material 3 schemes + Poppins typography
 ```
 
 Illustrated banners live in `res/drawable-nodpi/` (optimized WebP).
-To add or edit content, change `HandbookData.kt` / `StudyTools.kt` — plain Kotlin
-data, with unit tests verifying IDs, quiz validity and calculator maths.
+To add or edit content, change the `data/` files — plain Kotlin data, with unit
+tests verifying IDs, quiz validity, specialty roadmaps and calculator maths.
 
 ## Tech stack
 

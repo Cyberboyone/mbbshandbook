@@ -1000,6 +1000,7 @@ object Handbook {
 
     // Declared last: object properties initialize in declaration order, so the
     // aggregate lists must come after all the private section vals above.
+    // Extra topics from HandbookExtras are appended per section.
     val sections: List<Section> = listOf(
         startSection,
         preclinicalSection,
@@ -1012,7 +1013,9 @@ object Handbook {
         resourcesSection,
         mnemonicsSection,
         emergenciesSection
-    )
+    ).map { section ->
+        section.copy(topics = section.topics + HandbookExtras.forSection(section.id))
+    }
 
     val allTopics: List<Topic> = sections.flatMap { it.topics }
 }
