@@ -70,7 +70,6 @@ fun TestAdBanner(modifier: Modifier = Modifier) {
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            adView.adListener = null
             adView.destroy()
         }
     }

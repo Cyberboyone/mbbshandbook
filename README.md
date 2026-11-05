@@ -178,7 +178,7 @@ tests verifying IDs, quiz validity, specialty roadmaps and calculator maths.
 
 ## Tech stack
 
-- Kotlin 2.0, Jetpack Compose (BOM 2024.09), Material 3
+- Kotlin 2.3, Jetpack Compose (BOM 2025.06), Material 3
 - Navigation Compose (animated transitions), AndroidX Activity (edge-to-edge)
 - AGP 8.9, Gradle 8.11, JDK 17 · minSdk 24 · compile/targetSdk 36
 - Google Mobile Ads SDK (legacy) + UMP consent, test IDs only
