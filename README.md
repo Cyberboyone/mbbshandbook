@@ -5,8 +5,9 @@ every phase of medical school, clinical skills, exam technique, ethics, wellbein
 plus interactive study tools.
 
 Built with **Kotlin + Jetpack Compose (Material 3)**, custom **Poppins** typography,
-gradient UI, illustrated banners, and animated transitions. No account, no internet,
-no tracking.
+gradient UI, illustrated banners, and animated transitions. No account. Core
+handbook content works offline; the optional AdMob banner is currently in
+**test-ad mode** and needs a network connection.
 
 ## ✨ Features
 
@@ -44,10 +45,41 @@ Searchable, with per-specialty gradient themes.
 - **Bookmarks** saved on-device
 - **Share** any topic as text
 - **Dark mode** + edge-to-edge design, animated navigation
-- Works fully **offline** (min Android 7.0 / API 24)
+- Core content works **offline** (min Android 7.0 / API 24); test ad banners need network
 
 > ⚠️ Educational guidance for students — not medical advice. Always follow your
 > school's curriculum, your supervisors and current local clinical guidelines.
+
+## 💚 Logo / launcher icon
+
+The launcher icon is an open book with a stethoscope, on the app's green
+gradient. Adaptive, round, legacy PNG and Android 13+ themed/monochrome variants
+are all generated from the same mark. A 512×512 Play Store icon is in
+[`store-listing/icon-512.png`](store-listing/icon-512.png). Regenerate PNGs with:
+
+```bash
+pip install resvg-py
+python3 scripts/generate_icons.py
+```
+
+## 🧪 Ads (AdMob test mode)
+
+The app integrates the Google Mobile Ads SDK **with Google's official test IDs
+only**:
+
+- App ID: `ca-app-pub-3940256099942544~3347511713`
+- Banner unit: `ca-app-pub-3940256099942544/9214589741`
+
+Banners are anchored adaptive banners shown only on browse/catalog screens
+(home, section lists, specialties, quiz/flashcard/calculator/glossary catalogs).
+They are **not** shown while reading a topic, taking a quiz, flipping flashcards,
+or using a calculator. A UMP consent gate runs before ads initialize; if consent
+is unavailable, the app simply hides ads. A unit test guards the test-only IDs.
+
+Before any live monetization: create your own AdMob app/ad unit, replace the IDs
+in `AndroidManifest.xml` and `ads/AdsConfig.kt`, configure UMP privacy messages,
+publish a privacy policy, and complete Play Data Safety + ads declarations. See
+[`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
 
 ## CI artifacts (GitHub Actions)
 
@@ -62,6 +94,13 @@ which runs the unit tests and then builds **all three artifacts**:
 
 Download them from the **Actions tab → latest run → Artifacts**.
 Pushing a tag like `v1.0.0` also attaches all three files to a GitHub Release.
+
+## Play Store readiness
+
+The app is **not production-upload ready yet**. It now targets API 36 and has
+test ads, but release signing, privacy policy/Data Safety, store listing assets,
+content rating, and (for new personal accounts) closed testing still need to be
+completed. Checklist: [`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
 
 ## Release signing
 
@@ -94,7 +133,7 @@ The next CI run signs the release APK and AAB with your key automatically.
 
 ## Building locally
 
-Requirements: JDK 17, Android SDK (platform 35). Android Studio Koala or newer
+Requirements: JDK 17, Android SDK (platform 36). Android Studio Ladybug or newer
 works out of the box.
 
 ```bash
@@ -110,7 +149,8 @@ Install the debug APK on a connected device: `adb install app/build/outputs/apk/
 
 ```
 app/src/main/java/com/mbbshandbook/app/
-├── MainActivity.kt          # navigation host with animated transitions
+├── MainActivity.kt          # navigation host + consent-gated ads startup
+├── ads/                     # AdMob test IDs, UMP consent gate, banner composable
 ├── Bookmarks.kt             # persistent bookmarks
 ├── Progress.kt              # reading progress + best quiz scores
 ├── data/
@@ -138,7 +178,8 @@ tests verifying IDs, quiz validity, specialty roadmaps and calculator maths.
 
 ## Tech stack
 
-- Kotlin 2.0, Jetpack Compose (BOM 2024.09), Material 3
+- Kotlin 2.3, Jetpack Compose (BOM 2025.06), Material 3
 - Navigation Compose (animated transitions), AndroidX Activity (edge-to-edge)
-- AGP 8.6, Gradle 8.9, JDK 17 · minSdk 24 · targetSdk 35
+- AGP 8.9, Gradle 8.11, JDK 17 · minSdk 24 · compile/targetSdk 36
+- Google Mobile Ads SDK (legacy) + UMP consent, test IDs only
 - R8 minification + resource shrinking for release builds

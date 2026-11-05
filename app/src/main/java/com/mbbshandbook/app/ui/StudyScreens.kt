@@ -74,6 +74,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.QuizScores
+import com.mbbshandbook.app.ads.TestAdBanner
 import com.mbbshandbook.app.data.FlashcardDeck
 import com.mbbshandbook.app.data.GlossaryEntry
 import com.mbbshandbook.app.data.QuizCategory
@@ -93,6 +94,7 @@ import kotlin.random.Random
 internal fun ToolScaffold(
     title: String,
     onBack: () -> Unit,
+    showTestAd: Boolean = false,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -110,6 +112,7 @@ internal fun ToolScaffold(
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = { if (showTestAd) TestAdBanner() },
         content = content
     )
 }
@@ -120,7 +123,7 @@ internal fun ToolScaffold(
 
 @Composable
 fun QuizHomeScreen(onCategoryClick: (String) -> Unit, onBack: () -> Unit) {
-    ToolScaffold("Quizzes", onBack) { padding ->
+    ToolScaffold("Quizzes", onBack, showTestAd = true) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -452,7 +455,7 @@ private data class ConfettiPiece(
 
 @Composable
 fun FlashcardHomeScreen(onDeckClick: (String) -> Unit, onBack: () -> Unit) {
-    ToolScaffold("Flashcards", onBack) { padding ->
+    ToolScaffold("Flashcards", onBack, showTestAd = true) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -651,7 +654,7 @@ private val calcs = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorHomeScreen(onCalcClick: (String) -> Unit, onBack: () -> Unit) {
-    ToolScaffold("Clinical Calculators", onBack) { padding ->
+    ToolScaffold("Clinical Calculators", onBack, showTestAd = true) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -886,7 +889,7 @@ fun GlossaryScreen(onBack: () -> Unit) {
             it.term.lowercase().contains(q) || it.definition.lowercase().contains(q)
         }
     }
-    ToolScaffold("Medical Glossary", onBack) { padding ->
+    ToolScaffold("Medical Glossary", onBack, showTestAd = true) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

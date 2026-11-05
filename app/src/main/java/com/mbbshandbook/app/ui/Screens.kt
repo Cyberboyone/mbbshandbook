@@ -1,6 +1,7 @@
 package com.mbbshandbook.app.ui
 
 import android.content.Intent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,10 +62,13 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.Bookmarks
 import com.mbbshandbook.app.Progress
+import com.mbbshandbook.app.ads.AdPrivacyOptionsButton
+import com.mbbshandbook.app.ads.TestAdBanner
 import com.mbbshandbook.app.data.ContentBlock
 import com.mbbshandbook.app.data.Handbook
 import com.mbbshandbook.app.data.Section
@@ -102,7 +106,19 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("MBBS Handbook", fontWeight = FontWeight.Bold) },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(com.mbbshandbook.app.R.drawable.ic_brand_mark),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(RoundedCornerShape(9.dp))
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text("MBBS Handbook", fontWeight = FontWeight.Bold)
+                    }
+                },
                 actions = {
                     IconButton(onClick = onSearchClick) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
@@ -116,7 +132,8 @@ fun HomeScreen(
                 )
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = { TestAdBanner() }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -236,6 +253,9 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp, start = 4.dp, end = 4.dp)
                 )
+            }
+            item {
+                AdPrivacyOptionsButton(modifier = Modifier.fillMaxWidth())
             }
         }
     }
@@ -405,7 +425,8 @@ fun SectionScreen(sectionId: String, onTopicClick: (String) -> Unit, onBack: () 
                 )
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = { TestAdBanner() }
     ) { padding ->
         if (section == null) {
             EmptyState("Section not found", padding)
