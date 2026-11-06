@@ -50,10 +50,10 @@ import com.mbbshandbook.app.data.Specialty
 
 /** Gradient accent per specialty group. */
 private fun specialtyGradient(category: String): List<Color> = when (category) {
-    "Medical & longitudinal" -> listOf(Color(0xFF00695C), Color(0xFF26A69A))
-    "Surgical & procedural" -> listOf(Color(0xFFC62828), Color(0xFFEF5350))
-    "Acute & diagnostic" -> listOf(Color(0xFFE65100), Color(0xFFFFA726))
-    else -> listOf(Color(0xFF4527A0), Color(0xFF7E57C2))
+    "Medical & longitudinal" -> listOf(Color(0xFF0F5A50), Color(0xFF2BE3C3))
+    "Surgical & procedural" -> listOf(Color(0xFF8E2430), Color(0xFFFF7B7B))
+    "Acute & diagnostic" -> listOf(Color(0xFF9A5210), Color(0xFFFFC66B))
+    else -> listOf(Color(0xFF4A2F8F), Color(0xFFB39DDB))
 }
 
 // ---------------------------------------------------------------------------
@@ -108,7 +108,7 @@ fun SpecialtiesScreen(onSpecialtyClick: (String) -> Unit, onBack: () -> Unit) {
                             Text(
                                 category,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = specialtyGradient(category).first(),
+                                color = specialtyGradient(category).last(),
                                 modifier = Modifier.padding(top = 6.dp, bottom = 2.dp)
                             )
                         }
@@ -214,7 +214,7 @@ fun SpecialtyDetailScreen(specialtyId: String, onBack: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Brush.linearGradient(accent))
+                        .background(Brush.linearGradient(listOf(accent.first(), Color(0xFF0A1A15))))
                         .padding(20.dp)
                 ) {
                     Column {
@@ -329,7 +329,7 @@ private fun DetailCard(title: String, accent: List<Color>, content: @Composable 
             Text(
                 title,
                 style = MaterialTheme.typography.titleMedium,
-                color = accent.first()
+                color = accent.last()
             )
             Spacer(Modifier.height(8.dp))
             content()
@@ -368,7 +368,7 @@ private fun RoadmapTimeline(stages: List<RoadmapStage>, accent: List<Color>) {
                         modifier = Modifier
                             .size(30.dp)
                             .clip(CircleShape)
-                            .background(Brush.linearGradient(accent)),
+                            .background(accent.first()),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -383,7 +383,7 @@ private fun RoadmapTimeline(stages: List<RoadmapStage>, accent: List<Color>) {
                             modifier = Modifier
                                 .width(2.dp)
                                 .fillMaxHeight()
-                                .background(accent.first().copy(alpha = 0.3f))
+                                .background(accent.last().copy(alpha = 0.3f))
                         )
                     }
                 }
@@ -401,7 +401,7 @@ private fun RoadmapTimeline(stages: List<RoadmapStage>, accent: List<Color>) {
                     Text(
                         stage.duration,
                         style = MaterialTheme.typography.labelMedium,
-                        color = accent.first()
+                        color = accent.last()
                     )
                     Spacer(Modifier.height(6.dp))
                     stage.details.forEach { detail ->

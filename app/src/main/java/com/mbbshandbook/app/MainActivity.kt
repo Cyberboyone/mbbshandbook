@@ -1,7 +1,9 @@
 package com.mbbshandbook.app
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
@@ -13,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mbbshandbook.app.ads.AdsController
+import com.mbbshandbook.app.data.Handbook
 import com.mbbshandbook.app.ui.BookmarksScreen
 import com.mbbshandbook.app.ui.CalculatorHomeScreen
 import com.mbbshandbook.app.ui.CalculatorScreen
@@ -35,7 +38,10 @@ class MainActivity : ComponentActivity() {
         Bookmarks.init(this)
         Progress.init(this)
         QuizScores.init(this)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+        )
         AdsController.start(this)
         setContent {
             MbbsHandbookTheme {
@@ -61,7 +67,12 @@ class MainActivity : ComponentActivity() {
                             onFlashcardsClick = { navController.navigate("flashcards") },
                             onCalculatorsClick = { navController.navigate("calculators") },
                             onGlossaryClick = { navController.navigate("glossary") },
-                            onSpecialtiesClick = { navController.navigate("specialties") }
+                            onSpecialtiesClick = { navController.navigate("specialties") },
+                            onContinueReading = {
+                                val next = Handbook.allTopics.firstOrNull { !Progress.isRead(it.id) }
+                                    ?: Handbook.allTopics.first()
+                                navController.navigate("topic/${next.id}")
+                            }
                         )
                     }
                     composable("specialties") {

@@ -1,66 +1,73 @@
 package com.mbbshandbook.app.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val GreenPrimary = Color(0xFF0B6E4F)
-private val GreenDark = Color(0xFF084C37)
-private val GreenLight = Color(0xFFD7EDE4)
-private val AmberAccent = Color(0xFFB26A00)
+// ---------------------------------------------------------------------------
+// Dark fintech-inspired palette (locked dark, matching the design reference):
+// near-black teal background, dark elevated surfaces, glowing teal gradient
+// cards and a bright mint/cyan accent for actions and highlights.
+// ---------------------------------------------------------------------------
 
-private val LightColors = lightColorScheme(
-    primary = GreenPrimary,
-    onPrimary = Color.White,
-    primaryContainer = GreenLight,
-    onPrimaryContainer = GreenDark,
-    secondary = Color(0xFF4C6358),
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFCFE9DB),
-    onSecondaryContainer = Color(0xFF092016),
-    tertiary = AmberAccent,
-    tertiaryContainer = Color(0xFFFFDDB3),
-    onTertiaryContainer = Color(0xFF2B1700),
-    background = Color(0xFFF7FBF7),
-    onBackground = Color(0xFF181D1A),
-    surface = Color(0xFFF7FBF7),
-    onSurface = Color(0xFF181D1A),
-    surfaceVariant = Color(0xFFDCE5DD),
-    onSurfaceVariant = Color(0xFF404943),
-    outline = Color(0xFF707973)
+val TealBackground = Color(0xFF0A1411)
+val TealSurface = Color(0xFF111D18)
+val TealSurfaceHigh = Color(0xFF172620)
+val TealOutline = Color(0xFF27362F)
+val MintAccent = Color(0xFF2BE3C3)
+val MintDim = Color(0xFF8FE9D6)
+val TextPrimaryDark = Color(0xFFECF4F0)
+val TextSecondaryDark = Color(0xFF9DB4AB)
+val AmberDark = Color(0xFFFFC66B)
+val GlowGradient = listOf(Color(0xFF1F5244), Color(0xFF12352C), Color(0xFF0C221C))
+
+private val FintechDarkColors = darkColorScheme(
+    primary = MintAccent,
+    onPrimary = Color(0xFF03211B),
+    primaryContainer = Color(0xFF12352C),
+    onPrimaryContainer = Color(0xFFB5F4E4),
+    inversePrimary = Color(0xFF0B6E4F),
+    secondary = MintDim,
+    onSecondary = Color(0xFF03211B),
+    secondaryContainer = Color(0xFF182C25),
+    onSecondaryContainer = Color(0xFFCFEEE3),
+    tertiary = AmberDark,
+    onTertiary = Color(0xFF2B1700),
+    tertiaryContainer = Color(0xFF33270F),
+    onTertiaryContainer = Color(0xFFFFE3B3),
+    background = TealBackground,
+    onBackground = TextPrimaryDark,
+    surface = TealSurface,
+    onSurface = TextPrimaryDark,
+    surfaceVariant = TealSurfaceHigh,
+    onSurfaceVariant = TextSecondaryDark,
+    surfaceBright = Color(0xFF2A3A32),
+    surfaceDim = TealBackground,
+    surfaceContainerLowest = Color(0xFF060F0C),
+    surfaceContainerLow = TealSurface,
+    surfaceContainer = Color(0xFF14211B),
+    surfaceContainerHigh = TealSurfaceHigh,
+    surfaceContainerHighest = Color(0xFF1C2E26),
+    surfaceTint = MintAccent,
+    inverseSurface = Color(0xFFECF4F0),
+    inverseOnSurface = Color(0xFF0A1411),
+    outline = Color(0xFF5F7A70),
+    outlineVariant = TealOutline,
+    scrim = Color(0xFF000000)
 )
 
-private val DarkColors = darkColorScheme(
-    primary = Color(0xFF8ED6B5),
-    onPrimary = Color(0xFF003826),
-    primaryContainer = Color(0xFF005138),
-    onPrimaryContainer = Color(0xFFA9F2D0),
-    secondary = Color(0xFFB3CCBE),
-    onSecondary = Color(0xFF1F352A),
-    secondaryContainer = Color(0xFF354B40),
-    onSecondaryContainer = Color(0xFFCFE9DB),
-    tertiary = Color(0xFFFFB951),
-    tertiaryContainer = Color(0xFF653E00),
-    onTertiaryContainer = Color(0xFFFFDDB3),
-    background = Color(0xFF101512),
-    onBackground = Color(0xFFDFE4DF),
-    surface = Color(0xFF101512),
-    onSurface = Color(0xFFDFE4DF),
-    surfaceVariant = Color(0xFF404943),
-    onSurfaceVariant = Color(0xFFC0C9C1),
-    outline = Color(0xFF8A938C)
-)
-
+/**
+ * The app ships a single dark fintech-style theme to match the design
+ * reference, regardless of the system light/dark setting.
+ */
 @Composable
 fun MbbsHandbookTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
+        colorScheme = FintechDarkColors,
         typography = MbbsTypography,
         content = content
     )

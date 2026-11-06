@@ -3,6 +3,9 @@ package com.mbbshandbook.app.ui
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,19 +20,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.LocalLibrary
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
@@ -59,7 +62,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.painterResource
@@ -99,42 +101,23 @@ fun HomeScreen(
     onFlashcardsClick: () -> Unit,
     onCalculatorsClick: () -> Unit,
     onGlossaryClick: () -> Unit,
-    onSpecialtiesClick: () -> Unit
+    onSpecialtiesClick: () -> Unit,
+    onContinueReading: () -> Unit
 ) {
     val percent = Progress.percent()
     val readCount = Progress.readIds.count { id -> Handbook.allTopics.any { it.id == id } }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(com.mbbshandbook.app.R.drawable.ic_brand_mark),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(RoundedCornerShape(9.dp))
-                        )
-                        Spacer(Modifier.width(10.dp))
-                        Text("MBBS Handbook", fontWeight = FontWeight.Bold)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onSearchClick) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search")
-                    }
-                    IconButton(onClick = onBookmarksClick) {
-                        Icon(Icons.Filled.Bookmarks, contentDescription = "Bookmarks")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
-        },
         containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = { TestAdBanner() }
+        bottomBar = {
+            Column {
+                TestAdBanner()
+                HomeBottomBar(
+                    onSearchClick = onSearchClick,
+                    onBookmarksClick = onBookmarksClick
+                )
+            }
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -143,100 +126,115 @@ fun HomeScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // ---- Hero ----
+            // ---- Greeting ----
             item {
-                Box {
-                    BannerImage(res = com.mbbshandbook.app.R.drawable.hero, height = 210.dp)
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(18.dp)
-                    ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
                         Text(
-                            "MBBS Students\nHandbook",
-                            style = MaterialTheme.typography.headlineMedium,
+                            "MBBS Handbook",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "Your pocket study companion",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Image(
+                        painter = painterResource(com.mbbshandbook.app.R.drawable.ic_brand_mark),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(RoundedCornerShape(50))
+                    )
+                }
+            }
+
+            // ---- Glowing progress hero ----
+            item {
+                GlowPanel(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        "Study progress",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.75f)
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            "$percent%",
+                            style = MaterialTheme.typography.displaySmall,
+                            fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
-                        Text(
-                            "Your pocket companion through medical school",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.85f)
-                        )
-                    }
-                }
-            }
-
-            // ---- Progress ----
-            item {
-                Card(
-                    shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                ) {
-                    Column(Modifier.padding(16.dp)) {
+                        Spacer(Modifier.width(12.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                "📈 Your progress",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.weight(1f)
+                            Icon(
+                                Icons.Filled.ArrowUpward,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(14.dp)
                             )
+                            Spacer(Modifier.width(4.dp))
                             Text(
-                                "$percent%",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                "$readCount/${Handbook.allTopics.size} topics",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.85f)
                             )
                         }
-                        Spacer(Modifier.height(10.dp))
-                        LinearProgressIndicator(
-                            progress = { percent / 100f },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(RoundedCornerShape(4.dp)),
-                            strokeCap = StrokeCap.Round
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    LinearProgressIndicator(
+                        progress = { percent / 100f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = Color.White.copy(alpha = 0.12f),
+                        strokeCap = StrokeCap.Round
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        PillButton(
+                            text = "Continue",
+                            icon = Icons.Filled.PlayArrow,
+                            onClick = onContinueReading,
+                            modifier = Modifier.weight(1f)
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            "$readCount of ${Handbook.allTopics.size} topics read · ${Handbook.sections.size} sections",
-                            style = MaterialTheme.typography.bodySmall
+                        PillButton(
+                            text = "Search",
+                            icon = Icons.Filled.Search,
+                            onClick = onSearchClick,
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
             }
 
-            // ---- Study tools ----
-            item {
-                Text(
-                    "Study Tools",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
+            // ---- Quick actions ----
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ToolCard("Quizzes", "Test yourself", Icons.Filled.Quiz,
-                        listOf(Color(0xFF7B1FA2), Color(0xFFBA68C8)), Modifier.weight(1f), onQuizClick)
-                    ToolCard("Flashcards", "Flip & recall", Icons.Filled.Style,
-                        listOf(Color(0xFF1565C0), Color(0xFF64B5F6)), Modifier.weight(1f), onFlashcardsClick)
-                }
-            }
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ToolCard("Calculators", "Clinical maths", Icons.Filled.Calculate,
-                        listOf(Color(0xFFC62828), Color(0xFFE57373)), Modifier.weight(1f), onCalculatorsClick)
-                    ToolCard("Glossary", "Med terms A-Z", Icons.Filled.LocalLibrary,
-                        listOf(Color(0xFF00695C), Color(0xFF4DB6AC)), Modifier.weight(1f), onGlossaryClick)
+                    QuickTile("Quizzes", Icons.Filled.Quiz, onQuizClick, Modifier.weight(1f))
+                    QuickTile("Flashcards", Icons.Filled.Style, onFlashcardsClick, Modifier.weight(1f))
+                    QuickTile("Calculators", Icons.Filled.Calculate, onCalculatorsClick, Modifier.weight(1f))
                 }
             }
 
-            // ---- Specialties feature ----
+            // ---- Filter-style shortcuts ----
             item {
-                SpecialtiesFeatureCard(onClick = onSpecialtiesClick)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
+                ) {
+                    FilterPill("Specialties", selected = true, onClick = onSpecialtiesClick)
+                    FilterPill("Glossary", selected = false, onClick = onGlossaryClick)
+                    FilterPill("Saved", selected = false, onClick = onBookmarksClick)
+                    FilterPill("Mnemonics", selected = false, onClick = { onSectionClick("mnemonics") })
+                }
             }
 
-            // ---- Sections ----
+            // ---- Handbook sections ----
             item {
                 Text(
                     "Handbook",
@@ -245,7 +243,7 @@ fun HomeScreen(
                 )
             }
             itemsWithInlineAds(Handbook.sections, key = { it.id }) { section ->
-                SectionBannerCard(section = section, onClick = { onSectionClick(section.id) })
+                SectionRow(section = section, onClick = { onSectionClick(section.id) })
             }
             item {
                 Text(
@@ -262,149 +260,57 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** Dark fintech-style list row: gradient icon tile, title/subtitle, progress on the right. */
 @Composable
-private fun ToolCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    gradient: List<Color>,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Box(
-            Modifier
-                .background(Brush.linearGradient(gradient))
-                .padding(16.dp)
-        ) {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.22f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(icon, contentDescription = null, tint = Color.White)
-                }
-                Spacer(Modifier.height(10.dp))
-                Text(title, style = MaterialTheme.typography.titleSmall, color = Color.White)
-                Text(
-                    subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.85f)
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SpecialtiesFeatureCard(onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Box(
-            Modifier
-                .background(
-                    Brush.linearGradient(
-                        listOf(Color(0xFF4527A0), Color(0xFF7E57C2), Color(0xFFB39DDB))
-                    )
-                )
-                .padding(18.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("🩺", fontSize = 34.sp)
-                Spacer(Modifier.width(14.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        "Specialties & Roadmaps",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White
-                    )
-                    Text(
-                        "${com.mbbshandbook.app.data.Specialties.all.size} careers · training paths · exams · lifestyle",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.88f)
-                    )
-                }
-                Icon(
-                    Icons.Filled.ChevronRight,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SectionBannerCard(section: Section, onClick: () -> Unit) {
+private fun SectionRow(section: Section, onClick: () -> Unit) {
     val readIn = section.topics.count { Progress.isRead(it.id) }
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Box {
-            BannerImage(res = sectionBanner(section.id), height = 130.dp, cornerRadius = 0.dp)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(10.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(
-                        Brush.linearGradient(sectionGradient(section.id))
-                    )
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    if (readIn == section.topics.size) "✓ complete" else "$readIn/${section.topics.size} read",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    sectionEmojis[section.id] ?: "📖",
-                    fontSize = 26.sp
-                )
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        section.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White
-                    )
-                    Text(
-                        section.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.85f),
-                        maxLines = 1
-                    )
-                }
-                Icon(
-                    Icons.Filled.ChevronRight,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.9f)
-                )
-            }
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Brush.linearGradient(sectionGradient(section.id))),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(sectionEmojis[section.id] ?: "📖", fontSize = 22.sp)
         }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(section.title, style = MaterialTheme.typography.titleSmall)
+            Text(
+                "${section.topics.size} topics",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                if (readIn == section.topics.size) "✓ complete" else "$readIn/${section.topics.size} read",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (readIn == section.topics.size) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                "open section",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.width(6.dp))
+        Icon(
+            Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -440,24 +346,22 @@ fun SectionScreen(sectionId: String, onTopicClick: (String) -> Unit, onBack: () 
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 item {
-                    Box {
-                        BannerImage(res = sectionBanner(section.id), height = 150.dp)
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                "${sectionEmojis[section.id] ?: "📖"} ${section.title}",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = Color.White
-                            )
-                            Text(
-                                section.description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.85f)
-                            )
-                        }
+                    GlowPanel(
+                        modifier = Modifier.fillMaxWidth(),
+                        gradient = sectionGradient(section.id)
+                    ) {
+                        Text(sectionEmojis[section.id] ?: "📖", fontSize = 30.sp)
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            section.title,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.White
+                        )
+                        Text(
+                            section.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.85f)
+                        )
                     }
                     Spacer(Modifier.height(4.dp))
                 }
@@ -594,7 +498,17 @@ fun TopicScreen(topicId: String, onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
                 item {
-                    BannerImage(res = sectionBanner(section?.id ?: ""), height = 140.dp)
+                    GlowPanel(
+                        modifier = Modifier.fillMaxWidth(),
+                        gradient = sectionGradient(section?.id ?: ""),
+                        cornerRadius = 18.dp
+                    ) {
+                        Text(
+                            "${sectionEmojis[section?.id] ?: "📖"} ${section?.title ?: "Handbook"}",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White
+                        )
+                    }
                     Spacer(Modifier.height(14.dp))
                     Text(
                         topic.title,

@@ -4,8 +4,10 @@ A beautiful, offline-first Android handbook for MBBS students — study strategi
 every phase of medical school, clinical skills, exam technique, ethics, wellbeing,
 plus interactive study tools.
 
-Built with **Kotlin + Jetpack Compose (Material 3)**, custom **Poppins** typography,
-gradient UI, illustrated banners, and animated transitions. No account. Core
+Built with **Kotlin + Jetpack Compose (Material 3)** and custom **Poppins**
+typography. The UI follows a dark fintech-inspired design: near-black teal
+surfaces, glowing gradient progress card, pill buttons and filter chips,
+cyan-accented bottom navigation, and animated transitions. No account. Core
 handbook content works offline; the optional AdMob banner is currently in
 **test-ad mode** and needs a network connection.
 
@@ -14,8 +16,8 @@ handbook content works offline; the optional AdMob banner is currently in
 ### 📖 Handbook — 11 sections, 67 topics
 Getting started · Preclinical · Paraclinical · Clinical rotations · Clinical skills ·
 Exam success · Ethics · Wellbeing · Resources & career · **Mnemonics vault** ·
-**Emergency quick reference** — each section with its own illustrated banner and
-gradient theme. Includes ECG/CXR/ABG interpretation, lab patterns, ward calls,
+**Emergency quick reference** — each section with its own glowing gradient
+theme. Includes ECG/CXR/ABG interpretation, lab patterns, ward calls,
 suturing, SBAR handover, breaking bad news, end-of-life care, emergency drug
 doses, trauma and poisoning.
 
@@ -44,7 +46,7 @@ Searchable, with per-specialty gradient themes.
 - **Full-text search** across every topic
 - **Bookmarks** saved on-device
 - **Share** any topic as text
-- **Dark mode** + edge-to-edge design, animated navigation
+- **Dark fintech-style theme** + edge-to-edge design, animated navigation
 - Core content works **offline** (min Android 7.0 / API 24); test ad banners need network
 
 > ⚠️ Educational guidance for students — not medical advice. Always follow your
@@ -171,11 +173,11 @@ app/src/main/java/com/mbbshandbook/app/
     ├── Screens.kt           # home, section, topic, search, bookmarks
     ├── StudyScreens.kt      # quizzes, flashcards, calculators, glossary
     ├── SpecialtyScreens.kt  # specialty catalogue + roadmap detail
-    ├── Visuals.kt           # banner art + per-section gradients
-    └── theme/               # Material 3 schemes + Poppins typography
+    ├── Visuals.kt           # per-section gradient accents
+│   ├── FintechUi.kt         # glow panels, pill buttons, tiles, bottom nav
+    └── theme/               # Material 3 dark scheme + Poppins typography
 ```
 
-Illustrated banners live in `res/drawable-nodpi/` (optimized WebP).
 To add or edit content, change the `data/` files — plain Kotlin data, with unit
 tests verifying IDs, quiz validity, specialty roadmaps and calculator maths.
 
