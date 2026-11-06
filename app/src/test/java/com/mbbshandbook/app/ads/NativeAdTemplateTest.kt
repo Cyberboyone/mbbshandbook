@@ -85,9 +85,10 @@ class NativeAdTemplateTest {
             File("src/main/java/com/mbbshandbook/app/ui"),
             File("app/src/main/java/com/mbbshandbook/app/ui")
         ).first { it.exists() }
-        val calls = directory.walkTopLevel().filter { it.extension == "kt" }.flatMap {
-            it.readLines().filter { line -> line.contains("nativeAdPlacement =") }
-        }.toList()
+        val calls = directory.walkTopLevel()
+            .filter { file -> file.extension == "kt" }
+            .flatMap { file -> file.readLines().filter { line -> line.contains("nativeAdPlacement =") } }
+            .toList()
         assertEquals(8, calls.size)
         val specialty = File(directory, "SpecialtyScreens.kt").readText()
         val catalog = specialty.substringBefore("fun SpecialtyDetailScreen(")
