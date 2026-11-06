@@ -1,8 +1,8 @@
 # Google Play readiness — MBBS Handbook
 
 **Status: not ready for a production upload yet.** The codebase now clears the
-API-level blocker and has a test-only AdMob integration, but several Play Console
-and release-engineering steps remain.
+API-level blocker and uses the publisher-supplied AdMob IDs, but several Play
+Console and release-engineering steps remain.
 
 ## Done in this branch
 
@@ -10,11 +10,11 @@ and release-engineering steps remain.
       monochrome/themed, 512px store icon).
 - [x] `compileSdk` / `targetSdk` raised to **36** (Android 16). New apps and
       updates must target API 36 from 31 Aug 2026.
-- [x] AdMob integrated with **Google sample/test IDs only**; banner placement is
-      limited to browse/catalog screens, not active study flows. Inline test
-      banners appear after every four data rows in lists.
+- [x] AdMob integrated with the **publisher-supplied app and banner IDs**; banner
+      placement is limited to browse/catalog screens, not active study flows.
+      Inline banners appear after every four data rows in lists.
 - [x] UMP consent gate before ad initialization; privacy-options button appears
-      when required; unit test guards test-only IDs.
+      when required; unit tests guard the configured IDs.
 - [x] README no longer claims "no internet / no tracking".
 
 ## Required before uploading a release
@@ -25,10 +25,13 @@ and release-engineering steps remain.
    - Create a permanent upload keystore, add `KEYSTORE_BASE64`,
      `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` secrets, and enroll in Play
      App Signing. Keep the upload key backed up.
-2. **Decide the ads posture for the first public release**
-   - Test ads are for development/testing. For production, either remove ads or
-     replace the sample IDs with your real AdMob app ID + banner unit ID.
-   - If ads remain: declare **Contains ads = Yes** in Play Console App content.
+2. **Verify the live AdMob setup**
+   - App ID `ca-app-pub-9529770421530115~3987689260` and banner unit
+     `ca-app-pub-9529770421530115/5109199243` are configured. Confirm both belong
+     to this app in AdMob and that the app/store association is complete.
+   - Declare **Contains ads = Yes** in Play Console App content.
+   - Use registered AdMob test devices while validating; do not click your own
+     live ads. New units may not fill immediately.
 3. **Privacy policy**
    - Host a public HTTPS privacy policy (not a PDF/login-walled page). Add the URL
      to the Play listing and link it in-app.
@@ -41,7 +44,8 @@ and release-engineering steps remain.
      transit, and data deletion/contact instructions.
 5. **UMP / consent configuration**
    - In AdMob → Privacy & messaging, create the required GDPR/EEA-UK-Switzerland
-     message and any US state/CPRA message. Test with UMP debug geography on a
+     message and any US state/CPRA message for this publisher app ID. Publish
+     them before release. Test with UMP debug geography on a
      registered test device before release.
 6. **Store listing assets**
    - 512×512 icon (provided: `store-listing/icon-512.png`), 1024×500 feature
@@ -61,7 +65,7 @@ and release-engineering steps remain.
      edge-to-edge, offline mode, consent granted/denied, ad load failure, and
      upgrade from v1.1 (signature must match).
 10. **Versioning**
-   - This branch bumps to `versionCode 6` / `versionName 1.3.1`. Increase
+   - This branch bumps to `versionCode 7` / `versionName 1.4.0`. Increase
      `versionCode` for every Play upload.
 
 ## Quick release command path

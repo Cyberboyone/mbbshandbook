@@ -70,7 +70,7 @@ import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.Bookmarks
 import com.mbbshandbook.app.Progress
 import com.mbbshandbook.app.ads.AdPrivacyOptionsButton
-import com.mbbshandbook.app.ads.TestAdBanner
+import com.mbbshandbook.app.ads.AdBanner
 import com.mbbshandbook.app.ads.itemsWithInlineAds
 import com.mbbshandbook.app.data.ContentBlock
 import com.mbbshandbook.app.data.Handbook
@@ -111,7 +111,7 @@ fun HomeScreen(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             Column {
-                TestAdBanner()
+                AdBanner()
                 HomeBottomBar(
                     onSearchClick = onSearchClick,
                     onBookmarksClick = onBookmarksClick
@@ -333,7 +333,7 @@ fun SectionScreen(sectionId: String, onTopicClick: (String) -> Unit, onBack: () 
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = { TestAdBanner() }
+        bottomBar = { AdBanner() }
     ) { padding ->
         if (section == null) {
             EmptyState("Section not found", padding)

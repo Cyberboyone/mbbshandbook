@@ -74,7 +74,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.QuizScores
-import com.mbbshandbook.app.ads.TestAdBanner
+import com.mbbshandbook.app.ads.AdBanner
 import com.mbbshandbook.app.ads.itemsWithInlineAds
 import com.mbbshandbook.app.data.FlashcardDeck
 import com.mbbshandbook.app.data.GlossaryEntry
@@ -95,7 +95,7 @@ import kotlin.random.Random
 internal fun ToolScaffold(
     title: String,
     onBack: () -> Unit,
-    showTestAd: Boolean = false,
+    showBannerAd: Boolean = false,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -113,7 +113,7 @@ internal fun ToolScaffold(
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = { if (showTestAd) TestAdBanner() },
+        bottomBar = { if (showBannerAd) AdBanner() },
         content = content
     )
 }
@@ -124,7 +124,7 @@ internal fun ToolScaffold(
 
 @Composable
 fun QuizHomeScreen(onCategoryClick: (String) -> Unit, onBack: () -> Unit) {
-    ToolScaffold("Quizzes", onBack, showTestAd = true) { padding ->
+    ToolScaffold("Quizzes", onBack, showBannerAd = true) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -456,7 +456,7 @@ private data class ConfettiPiece(
 
 @Composable
 fun FlashcardHomeScreen(onDeckClick: (String) -> Unit, onBack: () -> Unit) {
-    ToolScaffold("Flashcards", onBack, showTestAd = true) { padding ->
+    ToolScaffold("Flashcards", onBack, showBannerAd = true) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -655,7 +655,7 @@ private val calcs = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorHomeScreen(onCalcClick: (String) -> Unit, onBack: () -> Unit) {
-    ToolScaffold("Clinical Calculators", onBack, showTestAd = true) { padding ->
+    ToolScaffold("Clinical Calculators", onBack, showBannerAd = true) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -890,7 +890,7 @@ fun GlossaryScreen(onBack: () -> Unit) {
             it.term.lowercase().contains(q) || it.definition.lowercase().contains(q)
         }
     }
-    ToolScaffold("Medical Glossary", onBack, showTestAd = true) { padding ->
+    ToolScaffold("Medical Glossary", onBack, showBannerAd = true) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
