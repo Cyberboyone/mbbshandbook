@@ -28,18 +28,26 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 
 /**
- * Discreet anchored adaptive banner used only on browse/catalog screens.
+ * Discreet adaptive banner used only on browse/catalog screens.
+ * The bottom placement uses an anchored adaptive banner; inline list placements
+ * use a height-capped inline adaptive banner designed for scrolling content.
  * It is never shown inside topic reading, active quizzes, flashcard play, or
  * calculator input screens. Uses Google's official test ad unit only.
  */
 @Composable
-fun TestAdBanner(modifier: Modifier = Modifier) {
+fun TestAdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
     if (!AdsController.adsReady) return
 
     val context = LocalContext.current
-    val widthDp = LocalConfiguration.current.screenWidthDp
-    val adSize = remember(context, widthDp) {
-        AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, widthDp)
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    // Inline banners live inside lists that already have 16dp horizontal padding.
+    val adWidthDp = if (isInline) (screenWidthDp - 32).coerceAtLeast(1) else screenWidthDp
+    val adSize = remember(context, adWidthDp, isInline) {
+        if (isInline) {
+            AdSize.getInlineAdaptiveBannerAdSize(adWidthDp, AdsConfig.INLINE_AD_MAX_HEIGHT_DP)
+        } else {
+            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidthDp)
+        }
     }
     val adView = remember(context, adSize) {
         AdView(context).apply {

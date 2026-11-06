@@ -11,6 +11,8 @@ class AdsConfigTest {
         assertTrue("Test-ad mode must stay enabled until a deliberate live-ads release", AdsConfig.TEST_ADS_ONLY)
         assertEquals("ca-app-pub-3940256099942544~3347511713", AdsConfig.TEST_ADMOB_APP_ID)
         assertEquals("ca-app-pub-3940256099942544/9214589741", AdsConfig.TEST_BANNER_AD_UNIT_ID)
+        assertEquals(4, AdsConfig.INLINE_AD_ROW_INTERVAL)
+        assertTrue(AdsConfig.INLINE_AD_MAX_HEIGHT_DP > 0)
     }
 
     @Test

@@ -11,7 +11,8 @@ and release-engineering steps remain.
 - [x] `compileSdk` / `targetSdk` raised to **36** (Android 16). New apps and
       updates must target API 36 from 31 Aug 2026.
 - [x] AdMob integrated with **Google sample/test IDs only**; banner placement is
-      limited to browse/catalog screens, not active study flows.
+      limited to browse/catalog screens, not active study flows. Inline test
+      banners appear after every four data rows in lists.
 - [x] UMP consent gate before ad initialization; privacy-options button appears
       when required; unit test guards test-only IDs.
 - [x] README no longer claims "no internet / no tracking".
@@ -60,7 +61,7 @@ and release-engineering steps remain.
      edge-to-edge, offline mode, consent granted/denied, ad load failure, and
      upgrade from v1.1 (signature must match).
 10. **Versioning**
-   - This branch bumps to `versionCode 3` / `versionName 1.2.0`. Increase
+   - This branch bumps to `versionCode 4` / `versionName 1.2.1`. Increase
      `versionCode` for every Play upload.
 
 ## Quick release command path
