@@ -256,11 +256,10 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     CI_STATUS=$?
     cat "$CI_LOG"
     if [ "$CI_STATUS" -ne 0 ]; then
-        {
-            printf '## Gradle failure diagnostics\n\n```text\n'
-            grep -E '(^e:|error:|FAILED|What went wrong|Execution failed|Caused by:|> Task|tests completed|NativeAd)' "$CI_LOG" | tail -n 160
-            printf '\n```\n'
-        } >> "$GITHUB_STEP_SUMMARY"
+        grep -E '(^e:|error:|FAILED|What went wrong|Execution failed|Caused by:|tests completed|NativeAd)' "$CI_LOG" | tail -n 40 | while IFS= read -r CI_LINE; do
+            CI_LINE=$(printf '%s' "$CI_LINE" | sed 's/%/%25/g; s/\r/%0D/g' | tr '\n' ' ')
+            printf '::error::%s\n' "$CI_LINE"
+        done
     fi
     rm -f "$CI_LOG"
     exit "$CI_STATUS"
