@@ -69,6 +69,7 @@ import com.mbbshandbook.app.Bookmarks
 import com.mbbshandbook.app.Progress
 import com.mbbshandbook.app.ads.AdPrivacyOptionsButton
 import com.mbbshandbook.app.ads.TestAdBanner
+import com.mbbshandbook.app.ads.itemsWithInlineAds
 import com.mbbshandbook.app.data.ContentBlock
 import com.mbbshandbook.app.data.Handbook
 import com.mbbshandbook.app.data.Section
@@ -243,7 +244,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
-            items(Handbook.sections, key = { it.id }) { section ->
+            itemsWithInlineAds(Handbook.sections, key = { it.id }) { section ->
                 SectionBannerCard(section = section, onClick = { onSectionClick(section.id) })
             }
             item {
@@ -460,7 +461,7 @@ fun SectionScreen(sectionId: String, onTopicClick: (String) -> Unit, onBack: () 
                     }
                     Spacer(Modifier.height(4.dp))
                 }
-                items(section.topics, key = { it.id }) { topic ->
+                itemsWithInlineAds(section.topics, key = { it.id }) { topic ->
                     TopicRow(topic = topic, onClick = { onTopicClick(topic.id) })
                 }
             }
@@ -736,7 +737,7 @@ fun SearchScreen(onTopicClick: (String) -> Unit, onBack: () -> Unit) {
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    items(results, key = { it.id }) { topic ->
+                    itemsWithInlineAds(results, key = { it.id }) { topic ->
                         TopicRow(topic = topic, onClick = { onTopicClick(topic.id) })
                     }
                 }
@@ -778,7 +779,7 @@ fun BookmarksScreen(onTopicClick: (String) -> Unit, onBack: () -> Unit) {
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(bookmarked, key = { it.id }) { topic ->
+                itemsWithInlineAds(bookmarked, key = { it.id }) { topic ->
                     TopicRow(topic = topic, onClick = { onTopicClick(topic.id) })
                 }
             }

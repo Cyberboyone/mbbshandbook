@@ -75,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.QuizScores
 import com.mbbshandbook.app.ads.TestAdBanner
+import com.mbbshandbook.app.ads.itemsWithInlineAds
 import com.mbbshandbook.app.data.FlashcardDeck
 import com.mbbshandbook.app.data.GlossaryEntry
 import com.mbbshandbook.app.data.QuizCategory
@@ -138,7 +139,7 @@ fun QuizHomeScreen(onCategoryClick: (String) -> Unit, onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            items(StudyTools.quizCategories, key = { it.id }) { cat ->
+            itemsWithInlineAds(StudyTools.quizCategories, key = { it.id }) { cat ->
                 QuizCategoryCard(cat, onClick = { onCategoryClick(cat.id) })
             }
         }
@@ -470,7 +471,7 @@ fun FlashcardHomeScreen(onDeckClick: (String) -> Unit, onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            items(StudyTools.flashcardDecks, key = { it.id }) { deck ->
+            itemsWithInlineAds(StudyTools.flashcardDecks, key = { it.id }) { deck ->
                 DeckCard(deck, onClick = { onDeckClick(deck.id) })
             }
         }
@@ -669,7 +670,7 @@ fun CalculatorHomeScreen(onCalcClick: (String) -> Unit, onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            items(calcs, key = { it.id }) { c ->
+            itemsWithInlineAds(calcs, key = { it.id }) { c ->
                 Card(
                     onClick = { onCalcClick(c.id) },
                     shape = RoundedCornerShape(16.dp),
@@ -917,7 +918,7 @@ fun GlossaryScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     contentPadding = PaddingValues(bottom = 24.dp)
                 ) {
-                    items(entries, key = { it.term }) { entry -> GlossaryCard(entry) }
+                    itemsWithInlineAds(entries, key = { it.term }) { entry -> GlossaryCard(entry) }
                 }
             }
         }

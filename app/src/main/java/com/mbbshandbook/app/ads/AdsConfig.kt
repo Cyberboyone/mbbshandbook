@@ -13,4 +13,10 @@ object AdsConfig {
 
     /** Guard used by tests and release checklists to keep live ads disabled. */
     const val TEST_ADS_ONLY = true
+
+    /** Show an inline test banner after this many data rows in browse lists. */
+    const val INLINE_AD_ROW_INTERVAL = 4
+
+    /** Keep inline list banners discreet instead of letting them grow very tall. */
+    const val INLINE_AD_MAX_HEIGHT_DP = 120
 }

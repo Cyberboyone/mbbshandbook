@@ -70,11 +70,14 @@ only**:
 - App ID: `ca-app-pub-3940256099942544~3347511713`
 - Banner unit: `ca-app-pub-3940256099942544/9214589741`
 
-Banners are anchored adaptive banners shown only on browse/catalog screens
-(home, section lists, specialties, quiz/flashcard/calculator/glossary catalogs).
-They are **not** shown while reading a topic, taking a quiz, flipping flashcards,
-or using a calculator. A UMP consent gate runs before ads initialize; if consent
-is unavailable, the app simply hides ads. A unit test guards the test-only IDs.
+Banners are shown only on browse/catalog screens (home, section lists,
+specialties, quiz/flashcard/calculator/glossary catalogs, search and bookmarks).
+The existing bottom banner remains, and an inline test banner is inserted after
+every four data rows while more rows follow. Headers/intro text do not count as
+rows. Ads are **not** shown while reading a topic, taking a quiz, flipping
+flashcards, or using a calculator. A UMP consent gate runs before ads initialize;
+if consent is unavailable, the app simply hides ads. Unit tests guard the
+test-only IDs and the four-row placement rule.
 
 Before any live monetization: create your own AdMob app/ad unit, replace the IDs
 in `AndroidManifest.xml` and `ads/AdsConfig.kt`, configure UMP privacy messages,
