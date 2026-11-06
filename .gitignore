@@ -26,3 +26,6 @@ ci-artifacts/
 # Local ad verification scratch
 .ad-check-tools/
 .ad-check-out/
+
+# Downloaded CI installers (do not commit binaries)
+downloads/
