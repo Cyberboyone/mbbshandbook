@@ -10,9 +10,11 @@ Console and release-engineering steps remain.
       monochrome/themed, 512px store icon).
 - [x] `compileSdk` / `targetSdk` raised to **36** (Android 16). New apps and
       updates must target API 36 from 31 Aug 2026.
-- [x] AdMob integrated with the **publisher-supplied app and banner IDs**; banner
-      placement is limited to browse/catalog screens, not active study flows.
-      Inline banners appear after every four data rows in lists.
+- [x] AdMob integrated with the **publisher-supplied app, banner and Native
+      Advanced IDs**. Existing banner placements are unchanged (bottom plus
+      every four data rows). One additional native card follows row six only in
+      eligible browse/catalog lists with more content below; active study/detail
+      flows do not receive native ads.
 - [x] UMP consent gate before ad initialization; privacy-options button appears
       when required; unit tests guard the configured IDs.
 - [x] README no longer claims "no internet / no tracking".
@@ -26,9 +28,13 @@ Console and release-engineering steps remain.
      `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` secrets, and enroll in Play
      App Signing. Keep the upload key backed up.
 2. **Verify the live AdMob setup**
-   - App ID `ca-app-pub-9529770421530115~3987689260` and banner unit
-     `ca-app-pub-9529770421530115/5109199243` are configured. Confirm both belong
+   - App ID `ca-app-pub-9529770421530115~3987689260`, banner unit
+     `ca-app-pub-9529770421530115/5109199243`, and Native Advanced unit
+     `ca-app-pub-9529770421530115/8467833630` are configured. Confirm all belong
      to this app in AdMob and that the app/store association is complete.
+   - Verify native image/video fill on a registered test device. Check the
+     “Advertisement” label, unobscured AdChoices, asset clicks, muted video,
+     background pause, navigation cleanup, and no placeholder on no-fill.
    - Declare **Contains ads = Yes** in Play Console App content.
    - Use registered AdMob test devices while validating; do not click your own
      live ads. New units may not fill immediately.
@@ -46,7 +52,8 @@ Console and release-engineering steps remain.
    - In AdMob → Privacy & messaging, create the required GDPR/EEA-UK-Switzerland
      message and any US state/CPRA message for this publisher app ID. Publish
      them before release. Test with UMP debug geography on a
-     registered test device before release.
+     registered test device before release. The app itself does not enable debug
+     geography or reset consent automatically.
 6. **Store listing assets**
    - 512×512 icon (provided: `store-listing/icon-512.png`), 1024×500 feature
      graphic, phone screenshots (and tablet if targeting tablets), short/full
@@ -62,10 +69,11 @@ Console and release-engineering steps remain.
      production access. Organization accounts are exempt.
 9. **Pre-launch / device testing**
    - Run Play pre-launch report, test on Android 7/10/13/15/16, dark mode,
-     edge-to-edge, offline mode, consent granted/denied, ad load failure, and
-     upgrade from v1.1 (signature must match).
+     edge-to-edge, offline mode, consent granted/denied/revoked, banner/native
+     load failure and retry, native navigation/late callbacks, and upgrade from
+     the previous release (signature must match).
 10. **Versioning**
-   - This branch bumps to `versionCode 7` / `versionName 1.4.0`. Increase
+   - This branch bumps to `versionCode 8` / `versionName 1.5.0`. Increase
      `versionCode` for every Play upload.
 
 ## Quick release command path
@@ -81,5 +89,7 @@ Console and release-engineering steps remain.
 - Play target API requirement: https://support.google.com/googleplay/android-developer/answer/11926878
 - AdMob Android quick start / test ads: https://developers.google.com/admob/android/quick-start
 - UMP consent: https://developers.google.com/admob/android/privacy
+- Native loading / rendering: https://developers.google.com/admob/android/native
+  and https://developers.google.com/admob/android/native/advanced
 - Play app review / ads / privacy policy: https://support.google.com/googleplay/android-developer/answer/9859455
 - Personal-account closed testing: https://support.google.com/googleplay/android-developer/answer/14151465

@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.ads.ListAdPlacement
+import com.mbbshandbook.app.ads.NativeAdvancedAd
 import com.mbbshandbook.app.ads.AdBanner
 import com.mbbshandbook.app.data.RoadmapStage
 import com.mbbshandbook.app.data.Specialties
@@ -115,13 +116,15 @@ fun SpecialtiesScreen(onSpecialtyClick: (String) -> Unit, onBack: () -> Unit) {
                         items(list, key = { it.id }) { specialty ->
                             val dataIndex = dataIndexById[specialty.id] ?: 0
                             val showAdAfter = ListAdPlacement.shouldShowAfter(dataIndex, results.size)
-                            if (showAdAfter) {
+                            val showNativeAfter = ListAdPlacement.shouldShowNativeAfter(dataIndex, results.size)
+                            if (showAdAfter || showNativeAfter) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     SpecialtyCard(specialty, onClick = { onSpecialtyClick(specialty.id) })
-                                    AdBanner(isInline = true)
+                                    if (showNativeAfter) NativeAdvancedAd(placement = "specialties")
+                                    if (showAdAfter) AdBanner(isInline = true)
                                 }
                             } else {
                                 SpecialtyCard(specialty, onClick = { onSpecialtyClick(specialty.id) })

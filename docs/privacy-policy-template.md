@@ -12,7 +12,7 @@
 
 MBBS Handbook is an offline-first educational app. Your bookmarks, reading
 progress and quiz scores are stored locally on your device. We do not require an
-account. The app uses Google AdMob to request advertisements. Google and its
+account. The app uses Google AdMob to request banner and native advertisements. Google and its
 partners may process device/advertising data as described below, subject to
 your privacy choices and region.
 

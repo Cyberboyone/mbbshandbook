@@ -139,7 +139,7 @@ fun QuizHomeScreen(onCategoryClick: (String) -> Unit, onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            itemsWithInlineAds(StudyTools.quizCategories, key = { it.id }) { cat ->
+            itemsWithInlineAds(StudyTools.quizCategories, key = { it.id }, nativeAdPlacement = "quiz-catalog") { cat ->
                 QuizCategoryCard(cat, onClick = { onCategoryClick(cat.id) })
             }
         }
@@ -471,7 +471,7 @@ fun FlashcardHomeScreen(onDeckClick: (String) -> Unit, onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            itemsWithInlineAds(StudyTools.flashcardDecks, key = { it.id }) { deck ->
+            itemsWithInlineAds(StudyTools.flashcardDecks, key = { it.id }, nativeAdPlacement = "flashcard-catalog") { deck ->
                 DeckCard(deck, onClick = { onDeckClick(deck.id) })
             }
         }
@@ -670,7 +670,7 @@ fun CalculatorHomeScreen(onCalcClick: (String) -> Unit, onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            itemsWithInlineAds(calcs, key = { it.id }) { c ->
+            itemsWithInlineAds(calcs, key = { it.id }, nativeAdPlacement = "calculator-catalog") { c ->
                 Card(
                     onClick = { onCalcClick(c.id) },
                     shape = RoundedCornerShape(16.dp),
@@ -918,7 +918,7 @@ fun GlossaryScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     contentPadding = PaddingValues(bottom = 24.dp)
                 ) {
-                    itemsWithInlineAds(entries, key = { it.term }) { entry -> GlossaryCard(entry) }
+                    itemsWithInlineAds(entries, key = { it.term }, nativeAdPlacement = "glossary") { entry -> GlossaryCard(entry) }
                 }
             }
         }
