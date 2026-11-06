@@ -22,3 +22,7 @@ Thumbs.db
 
 # CI scratch
 ci-artifacts/
+
+# Local ad verification scratch
+.ad-check-tools/
+.ad-check-out/

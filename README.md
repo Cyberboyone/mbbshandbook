@@ -78,8 +78,20 @@ The existing bottom banner remains, and an inline test banner is inserted after
 every four data rows while more rows follow. Headers/intro text do not count as
 rows. Ads are **not** shown while reading a topic, taking a quiz, flipping
 flashcards, or using a calculator. A UMP consent gate runs before ads initialize;
-if consent is unavailable, the app simply hides ads. Unit tests guard the
-test-only IDs and the four-row placement rule.
+if consent is unavailable, the app hides ads without blocking handbook content.
+Banners are attached and measured before loading; inline slots reserve a real
+measurement internally but occupy no list space until an actual test ad fills.
+Unit tests guard test-only IDs, consent/init sequencing, duplicate-request
+prevention, and the four-row placement rule.
+
+**If test ads do not appear:** install the **debug APK**, connect to the internet,
+and check the small status row above the bottom navigation. It reports privacy
+check, SDK initialization, or banner-load errors and offers **Retry**. Filter
+Logcat by `HandbookAds` for the SDK error code. Google's test creatives still
+require a network request; they are not bundled fake banners. Complete any
+privacy form shown. Release builds keep failed slots hidden and do not expose
+debug diagnostics. Scroll down to see inline ads after rows 4, 8, …; short lists
+with no following row intentionally have no trailing inline ad.
 
 Before any live monetization: create your own AdMob app/ad unit, replace the IDs
 in `AndroidManifest.xml` and `ads/AdsConfig.kt`, configure UMP privacy messages,

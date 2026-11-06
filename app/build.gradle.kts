@@ -14,8 +14,8 @@ android {
         applicationId = "com.mbbshandbook.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.3.0"
+        versionCode = 6
+        versionName = "1.3.1"
     }
 
     signingConfigs {
@@ -57,6 +57,8 @@ android {
     }
     buildFeatures {
         compose = true
+        // Debug-only ad diagnostics must never appear in release artifacts.
+        buildConfig = true
     }
 }
 
