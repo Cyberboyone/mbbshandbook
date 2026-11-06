@@ -8,8 +8,8 @@ Built with **Kotlin + Jetpack Compose (Material 3)** and custom **Poppins**
 typography. The UI follows a dark fintech-inspired design: near-black teal
 surfaces, glowing gradient progress card, pill buttons and filter chips,
 cyan-accented bottom navigation, and animated transitions. No account. Core
-handbook content works offline; the optional AdMob banner is currently in
-**test-ad mode** and needs a network connection.
+handbook content works offline; AdMob banners use the publisher's live app and
+banner IDs and need a network connection.
 
 ## ✨ Features
 
@@ -47,7 +47,7 @@ Searchable, with per-specialty gradient themes.
 - **Bookmarks** saved on-device
 - **Share** any topic as text
 - **Dark fintech-style theme** + edge-to-edge design, animated navigation
-- Core content works **offline** (min Android 7.0 / API 24); test ad banners need network
+- Core content works **offline** (min Android 7.0 / API 24); AdMob banners need network
 
 > ⚠️ Educational guidance for students — not medical advice. Always follow your
 > school's curriculum, your supervisors and current local clinical guidelines.
@@ -64,38 +64,42 @@ pip install resvg-py
 python3 scripts/generate_icons.py
 ```
 
-## 🧪 Ads (AdMob test mode)
+## 📢 Ads (publisher AdMob configuration)
 
-The app integrates the Google Mobile Ads SDK **with Google's official test IDs
-only**:
+The app integrates the Google Mobile Ads SDK with the publisher-supplied IDs:
 
-- App ID: `ca-app-pub-3940256099942544~3347511713`
-- Banner unit: `ca-app-pub-3940256099942544/9214589741`
+- App ID: `ca-app-pub-9529770421530115~3987689260`
+- Banner unit: `ca-app-pub-9529770421530115/5109199243`
+
+These are live publisher IDs, not Google's sample/test IDs. Register development
+devices as AdMob test devices before validating, and never click your own live
+ads. New ad units can take time to become eligible to serve.
 
 Banners are shown only on browse/catalog screens (home, section lists,
 specialties, quiz/flashcard/calculator/glossary catalogs, search and bookmarks).
-The existing bottom banner remains, and an inline test banner is inserted after
+The existing bottom banner remains, and an inline banner is inserted after
 every four data rows while more rows follow. Headers/intro text do not count as
 rows. Ads are **not** shown while reading a topic, taking a quiz, flipping
 flashcards, or using a calculator. A UMP consent gate runs before ads initialize;
 if consent is unavailable, the app hides ads without blocking handbook content.
 Banners are attached and measured before loading; inline slots reserve a real
-measurement internally but occupy no list space until an actual test ad fills.
-Unit tests guard test-only IDs, consent/init sequencing, duplicate-request
-prevention, and the four-row placement rule.
+measurement internally but occupy no list space until an actual ad fills.
+Unit tests guard the configured publisher IDs, consent/init sequencing,
+duplicate-request prevention, and the four-row placement rule.
 
-**If test ads do not appear:** install the **debug APK**, connect to the internet,
+**If ads do not appear:** install the **debug APK**, connect to the internet,
 and check the small status row above the bottom navigation. It reports privacy
 check, SDK initialization, or banner-load errors and offers **Retry**. Filter
-Logcat by `HandbookAds` for the SDK error code. Google's test creatives still
-require a network request; they are not bundled fake banners. Complete any
-privacy form shown. Release builds keep failed slots hidden and do not expose
-debug diagnostics. Scroll down to see inline ads after rows 4, 8, …; short lists
-with no following row intentionally have no trailing inline ad.
+Logcat by `HandbookAds` for the SDK error code. Complete any privacy form shown.
+Release builds keep failed slots hidden and do not expose debug diagnostics.
+Scroll down to see inline ads after rows 4, 8, …; short lists with no following
+row intentionally have no trailing inline ad. A valid request does not guarantee
+fill: check the AdMob app/unit setup, policy status, inventory and region.
 
-Before any live monetization: create your own AdMob app/ad unit, replace the IDs
-in `AndroidManifest.xml` and `ads/AdsConfig.kt`, configure UMP privacy messages,
-publish a privacy policy, and complete Play Data Safety + ads declarations. See
+Before public release: confirm the AdMob app/store association, publish the
+required UMP privacy messages for this app ID, host a privacy policy, and complete
+Play Data Safety + ads declarations. IDs are defined in `ads/AdsConfig.kt`; the
+manifest app ID must match it (covered by a unit test). See
 [`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
 
 ## CI artifacts (GitHub Actions)
@@ -115,8 +119,8 @@ Pushing a tag like `v1.0.0` also attaches all three files to a GitHub Release.
 ## Play Store readiness
 
 The app is **not production-upload ready yet**. It now targets API 36 and has
-test ads, but release signing, privacy policy/Data Safety, store listing assets,
-content rating, and (for new personal accounts) closed testing still need to be
+the publisher AdMob IDs, but release signing, privacy policy/Data Safety, store
+listing assets, content rating, and (for new personal accounts) closed testing still need to be
 completed. Checklist: [`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
 
 ## Release signing
@@ -167,7 +171,7 @@ Install the debug APK on a connected device: `adb install app/build/outputs/apk/
 ```
 app/src/main/java/com/mbbshandbook/app/
 ├── MainActivity.kt          # navigation host + consent-gated ads startup
-├── ads/                     # AdMob test IDs, UMP consent gate, banner composable
+├── ads/                     # publisher AdMob IDs, UMP consent gate, banner composable
 ├── Bookmarks.kt             # persistent bookmarks
 ├── Progress.kt              # reading progress + best quiz scores
 ├── data/
@@ -198,5 +202,5 @@ tests verifying IDs, quiz validity, specialty roadmaps and calculator maths.
 - Kotlin 2.3, Jetpack Compose (BOM 2025.06), Material 3
 - Navigation Compose (animated transitions), AndroidX Activity (edge-to-edge)
 - AGP 8.9, Gradle 8.11, JDK 17 · minSdk 24 · compile/targetSdk 36
-- Google Mobile Ads SDK (legacy) + UMP consent, test IDs only
+- Google Mobile Ads SDK (legacy) + UMP consent, publisher ad IDs
 - R8 minification + resource shrinking for release builds

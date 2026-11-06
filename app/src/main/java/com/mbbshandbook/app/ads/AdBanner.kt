@@ -50,7 +50,8 @@ import com.mbbshandbook.app.BuildConfig
 private const val TAG = "HandbookAds"
 
 /**
- * Real AdMob test banners only: no placeholder creative or consent bypass.
+ * Real AdMob banners using the publisher-supplied unit; no placeholder
+ * creative or consent bypass.
  *
  * The AdView must be attached and measured BEFORE loading. Its outer slot stays
  * collapsed until fill, while the Android view inside it retains a real,
@@ -58,7 +59,7 @@ private const val TAG = "HandbookAds"
  * release slots stay quiet on failure. Inline slots never show diagnostic UI.
  */
 @Composable
-fun TestAdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
+fun AdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
     if (LocalInspectionMode.current) return
 
     val context = LocalContext.current
@@ -69,7 +70,7 @@ fun TestAdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
         if (BuildConfig.DEBUG && !isInline) {
             AdDebugStatus(
                 modifier = modifier,
-                message = "Test ads: ${AdsController.statusMessage}",
+                message = "Ads: ${AdsController.statusMessage}",
                 retryEnabled = AdsController.canRetry
             ) {
                 activity?.let { AdsController.retry(it) }
@@ -100,7 +101,7 @@ fun TestAdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
     val requestGate = remember(context, adSize) { BannerRequestGate() }
     val adView = remember(context, adSize) {
         AdView(context).apply {
-            adUnitId = AdsConfig.TEST_BANNER_AD_UNIT_ID
+            adUnitId = AdsConfig.BANNER_AD_UNIT_ID
             setAdSize(adSize)
             // Keep the real SDK view visible to its own lifecycle. The Compose
             // wrapper clips it while loading; do not use View.GONE/INVISIBLE.
@@ -108,14 +109,14 @@ fun TestAdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
                 override fun onAdLoaded() {
                     adLoaded = true
                     loadError = null
-                    Log.i(TAG, "Google TEST banner loaded ($placement, ${adWidthDp}dp)")
+                    Log.i(TAG, "AdMob banner loaded ($placement, ${adWidthDp}dp)")
                     requestLayout()
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     adLoaded = false
                     loadError = "Load failed (${error.code}): ${error.message}"
-                    Log.w(TAG, "TEST banner failed ($placement): ${error.code} ${error.message}")
+                    Log.w(TAG, "AdMob banner failed ($placement): ${error.code} ${error.message}")
                 }
             }
         }
@@ -156,7 +157,7 @@ fun TestAdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
         )
         if (allowed) {
             loadError = null
-            Log.i(TAG, "Requesting Google TEST banner ($placement, ${adWidthDp}dp)")
+            Log.i(TAG, "Requesting AdMob banner ($placement, ${adWidthDp}dp)")
             adView.loadAd(AdRequest.Builder().build())
         }
     }
@@ -166,14 +167,14 @@ fun TestAdBanner(modifier: Modifier = Modifier, isInline: Boolean = false) {
         // occupy exactly zero pixels, including its separator.
         if (isInline && adLoaded) Spacer(Modifier.height(10.dp))
         if (BuildConfig.DEBUG && !isInline && !adLoaded) {
-            AdDebugStatus(message = "Test ads: ${loadError ?: "Loading banner…"}") {
+            AdDebugStatus(message = "Ads: ${loadError ?: "Loading banner…"}") {
                 localRetry++
                 activity?.let { AdsController.retry(it) }
             }
         }
         if (adLoaded) {
             Text(
-                text = "Advertisement · Test mode",
+                text = "Advertisement",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier

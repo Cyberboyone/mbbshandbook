@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 /**
- * Renders list rows and attaches an inline test banner after every fourth data
+ * Renders list rows and attaches an inline banner after every fourth data
  * row when more rows follow. The banner is kept inside the same lazy item as the
  * preceding row. The banner supplies its own separator only after a real fill,
  * so an unfilled slot occupies no space.
@@ -25,7 +25,7 @@ fun <T> LazyListScope.itemsWithInlineAds(
         if (ListAdPlacement.shouldShowAfter(index, items.size)) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 itemContent(item)
-                TestAdBanner(isInline = true)
+                AdBanner(isInline = true)
             }
         } else {
             itemContent(item)

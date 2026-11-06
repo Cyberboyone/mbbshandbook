@@ -15,7 +15,7 @@ import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 
 /**
- * Consent-first startup for Google's sample/test banners.
+ * Consent-first startup for the publisher-configured AdMob banners.
  *
  * Cached permission is checked while consent information updates. Failures are
  * observable and retryable rather than permanently disabling ads in this
@@ -163,18 +163,18 @@ object AdsController {
     private fun initialize(context: Context) {
         if (requestGate.isInitialized) {
             sdkInitialized = true
-            if (canRequestAds) statusMessage = "Test ads ready"
+            if (canRequestAds) statusMessage = "AdMob ready"
             return
         }
         if (!requestGate.beginInitialization(canRequestAds)) return
-        statusMessage = "Initializing Google test ads…"
+        statusMessage = "Initializing Google AdMob…"
         MobileAds.initialize(context) {
             mainHandler.post {
                 requestGate.completeInitialization()
                 sdkInitialized = true
                 if (canRequestAds) {
-                    statusMessage = "Test ads ready"
-                    Log.i(TAG, "Google Mobile Ads initialized; test banner requests enabled")
+                    statusMessage = "AdMob ready"
+                    Log.i(TAG, "Google Mobile Ads initialized; publisher banner requests enabled")
                 }
             }
         }

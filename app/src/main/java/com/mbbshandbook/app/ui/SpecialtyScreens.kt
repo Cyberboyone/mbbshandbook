@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbbshandbook.app.ads.ListAdPlacement
-import com.mbbshandbook.app.ads.TestAdBanner
+import com.mbbshandbook.app.ads.AdBanner
 import com.mbbshandbook.app.data.RoadmapStage
 import com.mbbshandbook.app.data.Specialties
 import com.mbbshandbook.app.data.Specialty
@@ -69,7 +69,7 @@ fun SpecialtiesScreen(onSpecialtyClick: (String) -> Unit, onBack: () -> Unit) {
         results.mapIndexed { index, specialty -> specialty.id to index }.toMap()
     }
 
-    ToolScaffold("Specialties & Roadmaps", onBack, showTestAd = true) { padding ->
+    ToolScaffold("Specialties & Roadmaps", onBack, showBannerAd = true) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -121,7 +121,7 @@ fun SpecialtiesScreen(onSpecialtyClick: (String) -> Unit, onBack: () -> Unit) {
                                     verticalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     SpecialtyCard(specialty, onClick = { onSpecialtyClick(specialty.id) })
-                                    TestAdBanner(isInline = true)
+                                    AdBanner(isInline = true)
                                 }
                             } else {
                                 SpecialtyCard(specialty, onClick = { onSpecialtyClick(specialty.id) })

@@ -13,10 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MbbsHandbook">
 
-        <!-- TEST-ONLY AdMob app ID. Replace before any live/production ad rollout. -->
+        <!-- Publisher-supplied AdMob app ID for MBBS Handbook. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-9529770421530115~3987689260" />
 
         <activity
             android:name=".MainActivity"
