@@ -249,4 +249,20 @@ eval "set -- $(
         tr '\n' ' '
     )" '"$@"'
 
+# TEMPORARY CI DIAGNOSTIC: mirror Gradle errors into the accessible job summary.
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    CI_LOG=$(mktemp)
+    "$JAVACMD" "$@" > "$CI_LOG" 2>&1
+    CI_STATUS=$?
+    cat "$CI_LOG"
+    if [ "$CI_STATUS" -ne 0 ]; then
+        {
+            printf '## Gradle failure diagnostics\n\n```text\n'
+            grep -E '(^e:|error:|FAILED|What went wrong|Execution failed|Caused by:|> Task|tests completed|NativeAd)' "$CI_LOG" | tail -n 160
+            printf '\n```\n'
+        } >> "$GITHUB_STEP_SUMMARY"
+    fi
+    rm -f "$CI_LOG"
+    exit "$CI_STATUS"
+fi
 exec "$JAVACMD" "$@"
