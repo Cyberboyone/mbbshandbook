@@ -15,7 +15,7 @@ import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 
 /**
- * Consent-first startup for the publisher-configured AdMob banners.
+ * Consent-first startup for the publisher-configured AdMob banners and native ads.
  *
  * Cached permission is checked while consent information updates. Failures are
  * observable and retryable rather than permanently disabling ads in this
@@ -174,7 +174,7 @@ object AdsController {
                 sdkInitialized = true
                 if (canRequestAds) {
                     statusMessage = "AdMob ready"
-                    Log.i(TAG, "Google Mobile Ads initialized; publisher banner requests enabled")
+                    Log.i(TAG, "Google Mobile Ads initialized; publisher ad requests enabled")
                 }
             }
         }

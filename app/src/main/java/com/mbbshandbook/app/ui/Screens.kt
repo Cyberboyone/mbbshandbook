@@ -242,7 +242,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
-            itemsWithInlineAds(Handbook.sections, key = { it.id }) { section ->
+            itemsWithInlineAds(Handbook.sections, key = { it.id }, nativeAdPlacement = "home") { section ->
                 SectionRow(section = section, onClick = { onSectionClick(section.id) })
             }
             item {
@@ -365,7 +365,7 @@ fun SectionScreen(sectionId: String, onTopicClick: (String) -> Unit, onBack: () 
                     }
                     Spacer(Modifier.height(4.dp))
                 }
-                itemsWithInlineAds(section.topics, key = { it.id }) { topic ->
+                itemsWithInlineAds(section.topics, key = { it.id }, nativeAdPlacement = "section") { topic ->
                     TopicRow(topic = topic, onClick = { onTopicClick(topic.id) })
                 }
             }
@@ -651,7 +651,7 @@ fun SearchScreen(onTopicClick: (String) -> Unit, onBack: () -> Unit) {
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    itemsWithInlineAds(results, key = { it.id }) { topic ->
+                    itemsWithInlineAds(results, key = { it.id }, nativeAdPlacement = "search") { topic ->
                         TopicRow(topic = topic, onClick = { onTopicClick(topic.id) })
                     }
                 }
@@ -693,7 +693,7 @@ fun BookmarksScreen(onTopicClick: (String) -> Unit, onBack: () -> Unit) {
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                itemsWithInlineAds(bookmarked, key = { it.id }) { topic ->
+                itemsWithInlineAds(bookmarked, key = { it.id }, nativeAdPlacement = "bookmarks") { topic ->
                     TopicRow(topic = topic, onClick = { onTopicClick(topic.id) })
                 }
             }

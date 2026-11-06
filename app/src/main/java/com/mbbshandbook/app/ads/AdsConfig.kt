@@ -3,9 +3,10 @@ package com.mbbshandbook.app.ads
 /**
  * AdMob configuration for MBBS Handbook.
  *
- * These publisher IDs were explicitly supplied for the v1.4.0 ad rollout.
+ * These publisher IDs were explicitly supplied for the ad rollout.
  * The app ID is declared in AndroidManifest.xml; the banner unit is used by
- * both anchored bottom banners and inline adaptive list banners.
+ * both anchored bottom banners and inline adaptive list banners. The separate
+ * Native Advanced unit is used for browse/catalog native cards.
  *
  * When validating live ads, register your device as an AdMob test device and
  * never click your own live advertisements.
@@ -13,6 +14,8 @@ package com.mbbshandbook.app.ads
 object AdsConfig {
     const val ADMOB_APP_ID = "ca-app-pub-9529770421530115~3987689260"
     const val BANNER_AD_UNIT_ID = "ca-app-pub-9529770421530115/5109199243"
+
+    const val NATIVE_ADVANCED_AD_UNIT_ID = "ca-app-pub-9529770421530115/8467833630"
 
     /** Publisher IDs are enabled; this is no longer the sample/test-only mode. */
     const val LIVE_ADS_ENABLED = true
@@ -22,4 +25,7 @@ object AdsConfig {
 
     /** Keep inline list banners discreet instead of letting them grow very tall. */
     const val INLINE_AD_MAX_HEIGHT_DP = 120
+
+    /** At most one native card per list, between the fourth-row banner slots. */
+    const val NATIVE_AD_AFTER_ROW = 6
 }

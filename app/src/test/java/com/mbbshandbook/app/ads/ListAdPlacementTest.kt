@@ -1,5 +1,6 @@
 package com.mbbshandbook.app.ads
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -28,5 +29,38 @@ class ListAdPlacementTest {
         assertFalse(ListAdPlacement.shouldShowAfter(zeroBasedIndex = 3, rowCount = 0))
         assertFalse(ListAdPlacement.shouldShowAfter(zeroBasedIndex = 3, rowCount = 9, interval = 0))
         assertFalse(ListAdPlacement.shouldShowAfter(zeroBasedIndex = 3, rowCount = 9, interval = -4))
+    }
+
+    @Test
+    fun `one native card follows the sixth data row only when more content follows`() {
+        assertTrue(ListAdPlacement.shouldShowNativeAfter(zeroBasedIndex = 5, rowCount = 7))
+        assertTrue(ListAdPlacement.shouldShowNativeAfter(zeroBasedIndex = 5, rowCount = 64))
+        assertFalse(ListAdPlacement.shouldShowNativeAfter(zeroBasedIndex = 5, rowCount = 6))
+        assertFalse(ListAdPlacement.shouldShowNativeAfter(zeroBasedIndex = 6, rowCount = 7))
+    }
+
+    @Test
+    fun `native placement is distinct from the unchanged banner cadence`() {
+        val rowCount = 64
+        val nativeRows = (0 until rowCount).filter {
+            ListAdPlacement.shouldShowNativeAfter(it, rowCount)
+        }
+        assertEquals(listOf(5), nativeRows)
+        nativeRows.forEach { index ->
+            assertFalse(ListAdPlacement.shouldShowAfter(index, rowCount))
+        }
+        assertTrue(ListAdPlacement.shouldShowAfter(3, rowCount))
+        assertTrue(ListAdPlacement.shouldShowAfter(7, rowCount))
+    }
+
+    @Test
+    fun `empty short and invalid lists never get a native card`() {
+        listOf(-1, 0, 1, 5, 6).forEach { count ->
+            (-1..count).forEach { index ->
+                assertFalse(ListAdPlacement.shouldShowNativeAfter(index, count))
+            }
+        }
+        assertFalse(ListAdPlacement.shouldShowNativeAfter(-1, 10))
+        assertFalse(ListAdPlacement.shouldShowNativeAfter(10, 10))
     }
 }
