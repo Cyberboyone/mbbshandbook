@@ -61,7 +61,7 @@ and release-engineering steps remain.
      edge-to-edge, offline mode, consent granted/denied, ad load failure, and
      upgrade from v1.1 (signature must match).
 10. **Versioning**
-   - This branch bumps to `versionCode 4` / `versionName 1.2.1`. Increase
+   - This branch bumps to `versionCode 5` / `versionName 1.3.0`. Increase
      `versionCode` for every Play upload.
 
 ## Quick release command path

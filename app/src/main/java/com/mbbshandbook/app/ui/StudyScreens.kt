@@ -188,7 +188,7 @@ private fun QuizCategoryCard(cat: QuizCategory, onClick: () -> Unit) {
                         )
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
-                    Text("Best $best%", style = MaterialTheme.typography.labelSmall, color = Color.White)
+                    Text("Best $best%", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         }
@@ -263,14 +263,14 @@ fun QuizPlayScreen(categoryId: String, onBack: () -> Unit) {
                     val isSelected = i == selected
                     val container by animateColorAsState(
                         when {
-                            answered && isCorrect -> Color(0xFF1B5E20).copy(alpha = 0.15f)
-                            answered && isSelected -> Color(0xFFB71C1C).copy(alpha = 0.12f)
+                            answered && isCorrect -> Color(0xFF2BE38F).copy(alpha = 0.14f)
+                            answered && isSelected -> Color(0xFFFF6B6B).copy(alpha = 0.12f)
                             else -> MaterialTheme.colorScheme.surface
                         }, label = "optionColor"
                     )
                     val border = when {
-                        answered && isCorrect -> Color(0xFF2E7D32)
-                        answered && isSelected -> Color(0xFFC62828)
+                        answered && isCorrect -> Color(0xFF4ADE80)
+                        answered && isSelected -> Color(0xFFFF7B7B)
                         else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
                     }
                     Card(
@@ -302,9 +302,9 @@ fun QuizPlayScreen(categoryId: String, onBack: () -> Unit) {
                             Spacer(Modifier.width(12.dp))
                             Text(option, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                             if (answered && isCorrect) {
-                                Icon(Icons.Filled.CheckCircle, null, tint = Color(0xFF2E7D32), modifier = Modifier.size(20.dp))
+                                Icon(Icons.Filled.CheckCircle, null, tint = Color(0xFF4ADE80), modifier = Modifier.size(20.dp))
                             } else if (answered && isSelected) {
-                                Icon(Icons.Filled.Close, null, tint = Color(0xFFC62828), modifier = Modifier.size(20.dp))
+                                Icon(Icons.Filled.Close, null, tint = Color(0xFFFF7B7B), modifier = Modifier.size(20.dp))
                             }
                         }
                     }
@@ -490,7 +490,7 @@ private fun DeckCard(deck: FlashcardDeck, onClick: () -> Unit) {
             Modifier
                 .background(
                     Brush.linearGradient(
-                        listOf(Color(0xFF1565C0).copy(alpha = 0.12f), Color(0xFF64B5F6).copy(alpha = 0.25f))
+                        listOf(Color(0xFF12352C).copy(alpha = 0.6f), Color(0xFF2BE3C3).copy(alpha = 0.14f))
                     )
                 )
                 .padding(16.dp),
@@ -569,8 +569,8 @@ fun FlashcardPlayScreen(deckId: String, onBack: () -> Unit) {
                         .fillMaxSize()
                         .background(
                             Brush.linearGradient(
-                                if (rotation <= 90f) listOf(Color(0xFF0B6E4F), Color(0xFF14A085))
-                                else listOf(Color(0xFF4527A0), Color(0xFF7E57C2))
+                                if (rotation <= 90f) listOf(Color(0xFF1F5244), Color(0xFF0C221C))
+                                else listOf(Color(0xFF155E52), Color(0xFF0B2B24))
                             )
                         )
                         .padding(24.dp),
