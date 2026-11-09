@@ -1,5 +1,7 @@
 import java.util.Properties
 import org.gradle.api.GradleException
+import java.security.KeyStore
+import java.security.cert.X509Certificate
 
 plugins {
     alias(libs.plugins.android.application)
@@ -101,8 +103,8 @@ val verifyReleaseSigning = tasks.register("verifyReleaseSigning") {
         ) {
             throw GradleException("Release alias/password configuration is incomplete.")
         }
-        val keyStore = java.security.KeyStore.getInstance(
-            releaseSigning.storeType ?: java.security.KeyStore.getDefaultType()
+        val keyStore = KeyStore.getInstance(
+            releaseSigning.storeType ?: KeyStore.getDefaultType()
         )
         uploadStore.inputStream().use { input ->
             keyStore.load(input, releaseSigning.storePassword!!.toCharArray())
@@ -111,7 +113,7 @@ val verifyReleaseSigning = tasks.register("verifyReleaseSigning") {
         if (!keyStore.containsAlias(alias) || !keyStore.isKeyEntry(alias)) {
             throw GradleException("Release keystore has no private-key entry for the configured alias.")
         }
-        val certificate = keyStore.getCertificate(alias) as? java.security.cert.X509Certificate
+        val certificate = keyStore.getCertificate(alias) as? X509Certificate
             ?: throw GradleException("Release signing certificate is not X.509.")
         certificate.checkValidity()
         if (certificate.subjectX500Principal.name.contains("Android Debug", ignoreCase = true)) {
