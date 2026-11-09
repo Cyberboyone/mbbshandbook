@@ -249,4 +249,19 @@ eval "set -- $(
         tr '\n' ' '
     )" '"$@"'
 
+# TEMPORARY CI DIAGNOSTIC
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    CI_LOG=$(mktemp)
+    "$JAVACMD" "$@" > "$CI_LOG" 2>&1
+    CI_STATUS=$?
+    cat "$CI_LOG"
+    if [ "$CI_STATUS" -ne 0 ]; then
+        grep -E '(^e:|error:|FAILED|What went wrong|Execution failed|Caused by:|GradleException|build.gradle.kts)' "$CI_LOG" | tail -n 35 | while IFS= read -r CI_LINE; do
+            CI_LINE=$(printf '%s' "$CI_LINE" | sed 's/%/%25/g; s/\r/%0D/g' | tr '\n' ' ')
+            printf '::error::%s\n' "$CI_LINE"
+        done
+    fi
+    rm -f "$CI_LOG"
+    exit "$CI_STATUS"
+fi
 exec "$JAVACMD" "$@"
