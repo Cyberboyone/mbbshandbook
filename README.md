@@ -128,44 +128,84 @@ which runs the unit tests and then builds **all three artifacts**:
 | Release APK (minified + resource-shrunk) | `assembleRelease` | `mbbshandbook-release-apk` |
 | Release Android App Bundle | `bundleRelease` | `mbbshandbook-release-aab` |
 
-Download them from the **Actions tab → latest run → Artifacts**.
-Pushing a tag like `v1.0.0` also attaches all three files to a GitHub Release.
+Download them from the **Actions tab → latest run → Artifacts**. The run also
+checksums the artifacts and, when signing secrets are configured, verifies that
+they carry the upload-key signature. Pushing a tag like `v1.6.0` attaches all
+three files plus `SHA256SUMS.txt` to a GitHub Release.
+
+A second job runs `lintRelease` and validates the Play listing text/assets, and
+the manual **Play Release** workflow builds a signed AAB and uploads it to a Play
+track (internal → alpha → beta → production). Those workflow edits are queued in
+[`docs/ci/workflows.patch`](docs/ci/workflows.patch) because the tooling token
+lacks GitHub's *Workflows* permission — see [`docs/ci/README.md`](docs/ci/README.md).
+Regardless of workflow configuration, `verifyReleaseSigning` and
+`REQUIRE_RELEASE_SIGNING` make Gradle refuse to produce release artifacts without
+an upload key, and `scripts/verify-release-signing.sh` checks the built artifact.
 
 ## Play Store readiness
 
-The app is **not production-upload ready yet**. It now targets API 36 and has
-the publisher AdMob IDs, but release signing, privacy policy/Data Safety, store
-listing assets, content rating, and (for new personal accounts) closed testing still need to be
-completed. Checklist: [`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
+The app is **upload-ready**: `versionCode 9` / `versionName 1.6.0`, target API 36,
+release signing wired to GitHub secrets, a shipped privacy policy, store listing
+copy and graphics, and CI that verifies the built AAB is signed with the upload
+key (never the debug key).
+
+What remains needs the Play/GitHub account owner: publishing the signing secrets,
+enabling GitHub Pages for the privacy policy, filling the Play Console forms,
+capturing screenshots, and pressing *Upload*. The full checklist, including the
+Data safety and content-rating answers, is in [`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
+
+Quick commands:
+
+```bash
+./scripts/set_signing_secrets.sh             # publish signing secrets to GitHub Actions
+./gradlew verifyReleaseSigning bundleRelease  # signed AAB + signature check
+python3 scripts/check_store_listing.py        # validate listing text/assets
+```
 
 ## Release signing
 
 By default (no secrets configured) release artifacts are **debug-signed** so CI
 always produces installable test builds. Debug-signed builds are **not** accepted
-by the Play Store and cannot upgrade an existing release-signed install.
+by the Play Store. CI verifies the signature of every release artifact whenever
+signing material is present, and `verifyReleaseSigning` fails the build when it
+is missing — so a debug-signed bundle cannot reach Play by accident.
 
-To sign with your own release key:
+One-time setup (creates the keystore, then publishes the secrets):
 
-1. Create a keystore (keep it safe — you need the same key for every future update):
+```bash
+./scripts/generate_signing_key.sh     # creates release-keystore.jks + .signing/
+./scripts/set_signing_secrets.sh      # KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+```
 
-   ```bash
-   keytool -genkeypair -v -keystore release-keystore.jks -alias mbbskey \
-     -keyalg RSA -keysize 2048 -validity 10000
-   ```
+Gradle also reads the secrets straight from the environment, which is what CI
+does (no properties file is written):
 
-2. Base64-encode it: `base64 -w0 release-keystore.jks` (macOS: `base64 -i release-keystore.jks`)
+```bash
+KEYSTORE_FILE=release-keystore.jks KEYSTORE_PASSWORD=… KEY_ALIAS=mbbshandbook KEY_PASSWORD=… \
+  ./gradlew bundleRelease
+./scripts/verify-release-signing.sh app/build/outputs/bundle/release/app-release.aab
+```
 
-3. Add these **repository secrets** (Settings → Secrets and variables → Actions):
+**Back up the keystore and its passwords** — losing them without Play App Signing
+means you can never update an existing listing. **Never commit** `*.jks`,
+`*.p12`, `keystore.properties`, `.signing/` or service-account JSON — all are
+gitignored. Full details, secret inventory and key rotation:
+[`docs/RELEASE.md`](docs/RELEASE.md).
 
-   | Secret | Value |
-   |---|---|
-   | `KEYSTORE_BASE64` | the base64 string from step 2 |
-   | `KEYSTORE_PASSWORD` | keystore password |
-   | `KEY_ALIAS` | e.g. `mbbskey` |
-   | `KEY_PASSWORD` | key password |
+## Privacy policy & store listing
 
-The next CI run signs the release APK and AAB with your key automatically.
-**Never commit** `*.jks` / `keystore.properties` — they are gitignored.
+- Public policy (also linked in-app from **About & privacy**):
+  [`docs/privacy-policy.html`](docs/privacy-policy.html), served at
+  `https://cyberboyone.github.io/mbbshandbook/privacy-policy.html` once GitHub
+  Pages is enabled for `main` / `docs`.
+- Store texts and changelogs: [`fastlane/metadata/android/en-US/`](fastlane/metadata/android/en-US/).
+- Graphics: `store-listing/icon-512.png`, `store-listing/feature-graphic-1024x500.png`
+  (regenerate with `python3 scripts/generate_store_graphics.py`), screenshots
+  guide in [`store-listing/README.md`](store-listing/README.md).
+- Play Console answers: [`docs/DATA_SAFETY.md`](docs/DATA_SAFETY.md),
+  [`docs/CONTENT_RATING.md`](docs/CONTENT_RATING.md).
+- Automated upload to a Play track: `.github/workflows/play-release.yml`
+  (needs the `PLAY_SERVICE_ACCOUNT_JSON` secret).
 
 ## Building locally
 
@@ -187,6 +227,7 @@ Install the debug APK on a connected device: `adb install app/build/outputs/apk/
 app/src/main/java/com/mbbshandbook/app/
 ├── MainActivity.kt          # navigation host + consent-gated ads startup
 ├── ads/                     # publisher IDs, UMP consent gate, banner + native composables
+├── Legal.kt                 # privacy policy / support URLs + disclaimers
 ├── Bookmarks.kt             # persistent bookmarks
 ├── Progress.kt              # reading progress + best quiz scores
 ├── data/
@@ -204,6 +245,7 @@ app/src/main/java/com/mbbshandbook/app/
     ├── Screens.kt           # home, section, topic, search, bookmarks
     ├── StudyScreens.kt      # quizzes, flashcards, calculators, glossary
     ├── SpecialtyScreens.kt  # specialty catalogue + roadmap detail
+    ├── AboutScreen.kt       # About & privacy (policy, support, disclaimer)
     ├── Visuals.kt           # per-section gradient accents
 │   ├── FintechUi.kt         # glow panels, pill buttons, tiles, bottom nav
     └── theme/               # Material 3 dark scheme + Poppins typography

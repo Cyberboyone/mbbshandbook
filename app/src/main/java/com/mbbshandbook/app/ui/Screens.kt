@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Quiz
@@ -102,7 +103,8 @@ fun HomeScreen(
     onCalculatorsClick: () -> Unit,
     onGlossaryClick: () -> Unit,
     onSpecialtiesClick: () -> Unit,
-    onContinueReading: () -> Unit
+    onContinueReading: () -> Unit,
+    onAboutClick: () -> Unit
 ) {
     val percent = Progress.percent()
     val readCount = Progress.readIds.count { id -> Handbook.allTopics.any { it.id == id } }
@@ -256,7 +258,43 @@ fun HomeScreen(
             item {
                 AdPrivacyOptionsButton(modifier = Modifier.fillMaxWidth())
             }
+            item {
+                AboutRow(onClick = onAboutClick)
+            }
         }
+    }
+}
+
+/** Footer entry point to the About & privacy screen (policy, disclaimer, support). */
+@Composable
+private fun AboutRow(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            Icons.Filled.Info,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            "About & privacy",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(Modifier.weight(1f))
+        Icon(
+            Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp)
+        )
     }
 }
 

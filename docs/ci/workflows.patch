@@ -1,0 +1,280 @@
+diff --git a/.github/workflows/android-build.yml b/.github/workflows/android-build.yml
+index 36681ee..d6d28ff 100644
+--- a/.github/workflows/android-build.yml
++++ b/.github/workflows/android-build.yml
+@@ -43,7 +43,11 @@ jobs:
+         with:
+           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+ 
++      # Secrets -> environment. Gradle reads KEYSTORE_FILE/KEYSTORE_PASSWORD/
++      # KEY_ALIAS/KEY_PASSWORD directly, so nothing is written to a properties
++      # file that could leak into an artifact or a cache.
+       - name: Configure release signing
++        id: signing
+         env:
+           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+@@ -52,21 +56,41 @@ jobs:
+         run: |
+           if [ -n "$KEYSTORE_BASE64" ]; then
+             echo "$KEYSTORE_BASE64" | base64 -d > release-keystore.jks
+-            printf 'storeFile=release-keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > keystore.properties
+-            echo "Signing release artifacts with the configured release key."
++            {
++              echo "KEYSTORE_FILE=release-keystore.jks"
++              echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
++              echo "KEY_ALIAS=$KEY_ALIAS"
++              echo "KEY_PASSWORD=$KEY_PASSWORD"
++            } >> "$GITHUB_ENV"
++            echo "configured=true" >> "$GITHUB_OUTPUT"
++            echo "Release artifacts will be signed with the configured upload key."
+           else
+-            echo "::warning::No KEYSTORE_BASE64 secret set - release artifacts will be debug-signed (fine for testing, NOT for Play Store upload). See README for how to add signing secrets."
++            echo "configured=false" >> "$GITHUB_OUTPUT"
++            echo "::warning::No KEYSTORE_BASE64 secret set - release artifacts will be debug-signed (fine for testing, NOT for Play Store upload). Run scripts/set_signing_secrets.sh. See docs/RELEASE.md."
+           fi
+ 
+       - name: Make gradlew executable
+         run: chmod +x gradlew
+ 
++      - name: Report signing status
++        run: ./gradlew printSigningStatus -q
++
+       - name: Run unit tests
+         run: ./gradlew testDebugUnitTest --stacktrace
+ 
+       - name: Build debug APK, release APK and release AAB
++        env:
++          # A git tag is a publishable release: refuse to build it without a real key.
++          REQUIRE_RELEASE_SIGNING: ${{ startsWith(github.ref, 'refs/tags/v') && 'true' || 'false' }}
+         run: ./gradlew assembleDebug assembleRelease bundleRelease --stacktrace
+ 
++      - name: Verify release artifacts are signed with the upload key
++        if: steps.signing.outputs.configured == 'true'
++        run: |
++          ./scripts/verify-release-signing.sh \
++            app/build/outputs/bundle/release/app-release.aab \
++            app/build/outputs/apk/release/app-release.apk
++
+       - name: Collect artifacts
+         run: |
+           mkdir -p ci-artifacts
+@@ -74,6 +98,7 @@ jobs:
+           cp app/build/outputs/apk/release/app-release.apk ci-artifacts/mbbshandbook-release.apk
+           cp app/build/outputs/bundle/release/app-release.aab ci-artifacts/mbbshandbook-release.aab
+           ls -lh ci-artifacts/
++          sha256sum ci-artifacts/* | tee ci-artifacts/SHA256SUMS.txt
+ 
+       - name: Upload debug APK
+         uses: actions/upload-artifact@v7
+@@ -99,6 +124,13 @@ jobs:
+           if-no-files-found: error
+           retention-days: 30
+ 
++      - name: Upload checksums
++        uses: actions/upload-artifact@v7
++        with:
++          name: mbbshandbook-checksums
++          path: ci-artifacts/SHA256SUMS.txt
++          retention-days: 30
++
+       - name: Write build summary
+         run: |
+           {
+@@ -106,14 +138,14 @@ jobs:
+             echo ""
+             echo "| Artifact | File | Size |"
+             echo "|---|---|---|"
+-            for f in ci-artifacts/*; do
++            for f in ci-artifacts/*.apk ci-artifacts/*.aab; do
+               echo "| $(basename "$f") | \`$f\` | $(du -h "$f" | cut -f1) |"
+             done
+             echo ""
+-            if [ -f keystore.properties ]; then
+-              echo "🔐 Release artifacts signed with the configured release key."
++            if [ -n "$KEYSTORE_FILE" ]; then
++              echo "🔐 Release artifacts signed with the configured upload key (verified)."
+             else
+-              echo "⚠️ Release artifacts are **debug-signed** (no signing secrets configured). See README → Release signing."
++              echo "⚠️ Release artifacts are **debug-signed** (no signing secrets configured). See docs/RELEASE.md."
+             fi
+           } >> "$GITHUB_STEP_SUMMARY"
+ 
+@@ -125,4 +157,42 @@ jobs:
+             ci-artifacts/mbbshandbook-debug.apk
+             ci-artifacts/mbbshandbook-release.apk
+             ci-artifacts/mbbshandbook-release.aab
++            ci-artifacts/SHA256SUMS.txt
+           generate_release_notes: true
++
++  quality:
++    name: Lint & Play listing check
++    runs-on: ubuntu-latest
++    timeout-minutes: 30
++
++    steps:
++      - name: Checkout
++        uses: actions/checkout@v7
++
++      - name: Set up JDK 17
++        uses: actions/setup-java@v6
++        with:
++          distribution: temurin
++          java-version: "17"
++
++      - name: Set up Gradle
++        uses: gradle/actions/setup-gradle@v6
++        with:
++          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
++
++      - name: Android lint
++        run: ./gradlew lintRelease --stacktrace
++
++      - name: Upload lint report
++        if: always()
++        uses: actions/upload-artifact@v7
++        with:
++          name: lint-report
++          path: app/build/reports/lint-results-release.html
++          if-no-files-found: warn
++          retention-days: 14
++
++      - name: Validate Play listing metadata & assets
++        run: |
++          python3 -m pip install --quiet --upgrade pillow
++          python3 scripts/check_store_listing.py
+diff --git a/.github/workflows/play-release.yml b/.github/workflows/play-release.yml
+new file mode 100644
+index 0000000..4434b2c
+--- /dev/null
++++ b/.github/workflows/play-release.yml
+@@ -0,0 +1,129 @@
++name: Play Release
++
++# Uploads a signed release AAB to a Google Play track.
++#
++# Prerequisites (one-time):
++#   1. Release signing secrets: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS,
++#      KEY_PASSWORD  -> scripts/set_signing_secrets.sh
++#   2. PLAY_SERVICE_ACCOUNT_JSON: a Play Console service-account key with
++#      "Release to testing tracks" (and later "Release to production") access,
++#      stored as a repository secret.
++#   3. The app must already exist in Play Console with at least one uploaded
++#      build for the package name com.mbbshandbook.app.
++#
++# Manual trigger only: Actions -> Play Release -> Run workflow.
++
++on:
++  workflow_dispatch:
++    inputs:
++      track:
++        description: "Play track to upload to"
++        type: choice
++        options: [internal, alpha, beta, production]
++        default: internal
++      status:
++        description: "Release status"
++        type: choice
++        options: [draft, inProgress, completed]
++        default: draft
++      user_fraction:
++        description: "Staged rollout fraction for production (0.0-1.0, blank = full)"
++        required: false
++        default: ""
++
++concurrency:
++  group: play-release
++  cancel-in-progress: false
++
++permissions:
++  contents: read
++
++jobs:
++  release:
++    name: Build & upload AAB
++    runs-on: ubuntu-latest
++    timeout-minutes: 45
++    environment: play-release
++
++    steps:
++      - name: Checkout
++        uses: actions/checkout@v7
++
++      - name: Set up JDK 17
++        uses: actions/setup-java@v6
++        with:
++          distribution: temurin
++          java-version: "17"
++
++      - name: Ensure Android SDK packages & licenses
++        run: |
++          SDKMANAGER="$(command -v sdkmanager || echo "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager")"
++          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
++          "$SDKMANAGER" "platforms;android-35" "build-tools;34.0.0"
++
++      - name: Set up Gradle
++        uses: gradle/actions/setup-gradle@v6
++        with:
++          cache-read-only: true
++
++      - name: Require release signing
++        env:
++          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
++          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
++          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
++          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
++        run: |
++          if [ -z "$KEYSTORE_BASE64" ]; then
++            echo "::error::KEYSTORE_BASE64 is not set. Run scripts/set_signing_secrets.sh first (docs/RELEASE.md)."
++            exit 1
++          fi
++          echo "$KEYSTORE_BASE64" | base64 -d > release-keystore.jks
++          {
++            echo "KEYSTORE_FILE=release-keystore.jks"
++            echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
++            echo "KEY_ALIAS=$KEY_ALIAS"
++            echo "KEY_PASSWORD=$KEY_PASSWORD"
++          } >> "$GITHUB_ENV"
++
++      - name: Publish service account key
++        env:
++          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
++        run: |
++          if [ -z "$PLAY_SERVICE_ACCOUNT_JSON" ]; then
++            echo "::error::PLAY_SERVICE_ACCOUNT_JSON is not set. See docs/RELEASE.md."
++            exit 1
++          fi
++          printf '%s' "$PLAY_SERVICE_ACCOUNT_JSON" > play-service-account.json
++          chmod 600 play-service-account.json
++
++      - name: Run unit tests
++        run: ./gradlew testDebugUnitTest --stacktrace
++
++      - name: Validate Play listing
++        run: |
++          python3 -m pip install --quiet --upgrade pillow
++          python3 scripts/check_store_listing.py
++
++      - name: Build signed AAB
++        env:
++          REQUIRE_RELEASE_SIGNING: "true"
++        run: ./gradlew verifyReleaseSigning bundleRelease --stacktrace
++
++      - name: Verify AAB signature
++        run: ./scripts/verify-release-signing.sh app/build/outputs/bundle/release/app-release.aab
++
++      - name: Upload to Google Play
++        uses: r0adkll/upload-google-play@v1
++        with:
++          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
++          packageName: com.mbbshandbook.app
++          releaseFiles: app/build/outputs/bundle/release/app-release.aab
++          track: ${{ inputs.track }}
++          status: ${{ inputs.status }}
++          userFraction: ${{ inputs.user_fraction }}
++          whatsNewDirectory: fastlane/metadata/android/en-US/changelogs
++          mappingFile: app/build/outputs/mapping/release/mapping.txt
++
++      - name: Clean up service account key
++        if: always()
++        run: rm -f play-service-account.json release-keystore.jks
