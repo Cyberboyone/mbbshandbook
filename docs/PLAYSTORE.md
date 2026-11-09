@@ -23,14 +23,15 @@ Console and release-engineering steps remain.
 
 1. **Release signing / Play App Signing**
    - Google Play rejects debug-signed artifacts. Older CI AABs were debug-signed;
-     do not upload them. Release builds now require a real upload key and CI
-     skips release artifacts when signing secrets are absent.
+     do not upload them. Release builds now require a real upload key and fail
+     explicitly when signing secrets are absent; no new release artifacts are
+     uploaded from that failed build.
    - Reuse the existing upload key if this app is already enrolled. For a new app,
      create a permanent upload keystore, add `KEYSTORE_BASE64`,
      `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` repository secrets, and
      enroll in Play App Signing. Keep the upload key backed up securely.
    - Re-run Android Build after adding secrets; upload only the newly generated
-     `mbbshandbook-release-aab` after the signing-verification step passes.
+     `mbbshandbook-release-aab` after `verifyReleaseSigning` passes.
    - Enter credentials only in GitHub Secrets/local ignored files, never in chat
      or committed files. See README → Release signing for the exact steps.
 2. **Verify the live AdMob setup**

@@ -128,10 +128,10 @@ which runs the unit tests and then builds **all three artifacts**:
 | Release APK (upload-key signed, minified) | `assembleRelease` | `mbbshandbook-release-apk` |
 | Release AAB (upload-key signed) | `bundleRelease` | `mbbshandbook-release-aab` |
 
-Download them from the **Actions tab → latest run → Artifacts**. Release artifacts
-are produced only when all four signing secrets are configured; otherwise the
-run is debug-only. Pushing a tag like `v1.0.0` attaches all three files to a
-GitHub Release only after release signing succeeds.
+Download them from the **Actions tab → latest successful run → Artifacts**.
+All four signing secrets must be configured for the current combined CI build
+to succeed. Pushing a tag like `v1.0.0` attaches all three files to a GitHub
+Release only after the build succeeds.
 
 ## Play Store readiness
 
@@ -144,11 +144,10 @@ testing also still need to be completed. Checklist: [`docs/PLAYSTORE.md`](docs/P
 ## Release signing (required for Google Play)
 
 Google Play rejects debug-signed APKs/AABs. This project **never falls back to
-debug signing for release builds**. Without an upload key, CI still runs tests
-and produces the clearly named debug APK, but skips release APK/AAB artifacts.
-AABs for Play must be signed with your private upload key; Play App Signing then
-manages the final app-signing key. Feature-branch/PR checks may run debug-only;
-main, version-tag and manually requested builds fail until signing is configured.
+debug signing for release builds**. Without an upload key, the release build
+fails explicitly and CI uploads no misleading release artifacts. AABs for Play
+must be signed with your private upload key; Play App Signing then manages the
+final app-signing key. Debug APK builds and unit tests do not require this key.
 
 **Already published this app or enrolled an upload key?** Reuse that existing
 upload keystore and alias. A different key can cause an upload-key mismatch.
@@ -183,9 +182,9 @@ For a new app, create a permanent upload key once and keep secure offline backup
 
 4. Re-run **Android Build** on `main` (or push a new commit). Download
    `mbbshandbook-release-aab` from that **new** run and upload it to Play Console.
-   Older CI artifacts remain debug-signed; do not reuse them. The run must show
-   the release build/signature-verification steps and “Release upload certificate
-   verified”. Missing secrets produce a debug-only run, not a Play-ready AAB.
+   Older CI artifacts remain debug-signed; do not reuse them. The run must pass
+   `verifyReleaseSigning` and log “Release upload certificate verified”. Missing
+   secrets fail the release build instead of producing a Play-ready AAB.
 
 For local release builds, create an ignored `keystore.properties` at the repo root:
 
@@ -198,13 +197,14 @@ keyPassword=YOUR_KEY_PASSWORD
 
 Then run `./gradlew verifyReleaseSigning bundleRelease`. The guard checks the
 keystore, private-key alias and certificate validity, and rejects the Android
-debug certificate. CI additionally verifies the generated release APK with
-`apksigner`. The APK and AAB are signed with the same configured upload key.
+debug certificate. The release APK and AAB are signed with the same configured
+upload key. You can additionally check a generated APK with Android SDK
+`apksigner verify --verbose --print-certs PATH_TO_APK`.
 
 **Never commit or upload** `*.jks`, `*.keystore`, `keystore.properties`, or the
-base64 text as repository files/GitHub artifacts. They are ignored locally and
-removed from the CI workspace after the run. Keep the keystore and passwords
-backed up securely; losing the upload key requires a Play Console recovery process.
+base64 text as repository files/GitHub artifacts. Local secret files are ignored;
+CI uses ephemeral runner workspaces. Keep the keystore and passwords backed up
+securely; losing the upload key requires a Play Console recovery process.
 
 ## Building locally
 
