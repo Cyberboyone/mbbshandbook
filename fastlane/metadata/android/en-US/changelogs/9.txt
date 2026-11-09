@@ -1,0 +1,9 @@
+First Play release of MBBS Handbook.
+
+• 11 handbook sections and 67 topics, offline
+• 168 quiz questions with explanations and saved best scores
+• 68 flashcards across 6 decks
+• Clinical calculators: BMI, drip rate, fluids, GCS, APGAR
+• 18 specialty roadmaps and a searchable glossary
+• New: About & privacy screen with the privacy policy and support link
+• Ads now respect your consent choices, with an in-app Ad privacy choices button

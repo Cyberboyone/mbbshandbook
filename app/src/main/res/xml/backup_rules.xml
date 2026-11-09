@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11 and below backup rules (android:fullBackupContent).
+  User study data (bookmarks, progress, quiz scores) may be backed up, but the
+  Google Mobile Ads / UMP consent stores are excluded: consent must be collected
+  on each device rather than restored from another one.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="com.google.android.gms.ads.MobileAds.xml" />
+    <exclude domain="sharedpref" path="com.google.android.gms.ads.xml" />
+    <exclude domain="sharedpref" path="google_ads_flags.xml" />
+    <exclude domain="sharedpref" path="admob.xml" />
+    <exclude domain="sharedpref" path="com.google.android.ump.xml" />
+    <exclude domain="sharedpref" path="UMConsent.xml" />
+</full-backup-content>

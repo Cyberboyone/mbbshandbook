@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mbbshandbook.app.ads.AdsController
 import com.mbbshandbook.app.data.Handbook
+import com.mbbshandbook.app.ui.AboutScreen
 import com.mbbshandbook.app.ui.BookmarksScreen
 import com.mbbshandbook.app.ui.CalculatorHomeScreen
 import com.mbbshandbook.app.ui.CalculatorScreen
@@ -72,7 +73,8 @@ class MainActivity : ComponentActivity() {
                                 val next = Handbook.allTopics.firstOrNull { !Progress.isRead(it.id) }
                                     ?: Handbook.allTopics.first()
                                 navController.navigate("topic/${next.id}")
-                            }
+                            },
+                            onAboutClick = { navController.navigate("about") }
                         )
                     }
                     composable("specialties") {
@@ -152,6 +154,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("glossary") {
                         GlossaryScreen(onBack = { navController.popBackStack() })
+                    }
+                    composable("about") {
+                        AboutScreen(onBack = { navController.popBackStack() })
                     }
                 }
             }

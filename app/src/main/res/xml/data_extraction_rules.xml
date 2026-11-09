@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ backup / device-transfer rules (android:dataExtractionRules).
+  Keeps the same policy as backup_rules.xml: study data may be restored, ad
+  consent state may not.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="com.google.android.gms.ads.MobileAds.xml" />
+        <exclude domain="sharedpref" path="com.google.android.gms.ads.xml" />
+        <exclude domain="sharedpref" path="google_ads_flags.xml" />
+        <exclude domain="sharedpref" path="admob.xml" />
+        <exclude domain="sharedpref" path="com.google.android.ump.xml" />
+        <exclude domain="sharedpref" path="UMConsent.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="com.google.android.gms.ads.MobileAds.xml" />
+        <exclude domain="sharedpref" path="com.google.android.gms.ads.xml" />
+        <exclude domain="sharedpref" path="google_ads_flags.xml" />
+        <exclude domain="sharedpref" path="admob.xml" />
+        <exclude domain="sharedpref" path="com.google.android.ump.xml" />
+        <exclude domain="sharedpref" path="UMConsent.xml" />
+    </device-transfer>
+</data-extraction-rules>
