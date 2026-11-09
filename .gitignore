@@ -12,6 +12,7 @@ local.properties
 
 # Signing material - NEVER commit real keys
 keystore.properties
+*.base64.txt
 *.jks
 *.keystore
 release-keystore.jks

@@ -22,11 +22,17 @@ Console and release-engineering steps remain.
 ## Required before uploading a release
 
 1. **Release signing / Play App Signing**
-   - Current CI release artifacts are debug-signed unless repository secrets are
-     configured. Debug-signed AABs are not accepted by Play.
-   - Create a permanent upload keystore, add `KEYSTORE_BASE64`,
-     `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` secrets, and enroll in Play
-     App Signing. Keep the upload key backed up.
+   - Google Play rejects debug-signed artifacts. Older CI AABs were debug-signed;
+     do not upload them. Release builds now require a real upload key and CI
+     skips release artifacts when signing secrets are absent.
+   - Reuse the existing upload key if this app is already enrolled. For a new app,
+     create a permanent upload keystore, add `KEYSTORE_BASE64`,
+     `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` repository secrets, and
+     enroll in Play App Signing. Keep the upload key backed up securely.
+   - Re-run Android Build after adding secrets; upload only the newly generated
+     `mbbshandbook-release-aab` after the signing-verification step passes.
+   - Enter credentials only in GitHub Secrets/local ignored files, never in chat
+     or committed files. See README → Release signing for the exact steps.
 2. **Verify the live AdMob setup**
    - App ID `ca-app-pub-9529770421530115~3987689260`, banner unit
      `ca-app-pub-9529770421530115/5109199243`, and Native Advanced unit
@@ -79,8 +85,8 @@ Console and release-engineering steps remain.
 ## Quick release command path
 
 ```bash
-# after secrets are configured
-./gradlew testDebugUnitTest bundleRelease
+# locally: after ignored keystore.properties is configured
+./gradlew testDebugUnitTest verifyReleaseSigning bundleRelease
 # upload app/build/outputs/bundle/release/app-release.aab to Play Console
 ```
 
@@ -91,5 +97,6 @@ Console and release-engineering steps remain.
 - UMP consent: https://developers.google.com/admob/android/privacy
 - Native loading / rendering: https://developers.google.com/admob/android/native
   and https://developers.google.com/admob/android/native/advanced
+- Android app signing: https://developer.android.com/studio/publish/app-signing
 - Play app review / ads / privacy policy: https://support.google.com/googleplay/android-developer/answer/9859455
 - Personal-account closed testing: https://support.google.com/googleplay/android-developer/answer/14151465

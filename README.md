@@ -125,47 +125,86 @@ which runs the unit tests and then builds **all three artifacts**:
 | Artifact | Gradle task | Download name |
 |---|---|---|
 | Debug APK | `assembleDebug` | `mbbshandbook-debug-apk` |
-| Release APK (minified + resource-shrunk) | `assembleRelease` | `mbbshandbook-release-apk` |
-| Release Android App Bundle | `bundleRelease` | `mbbshandbook-release-aab` |
+| Release APK (upload-key signed, minified) | `assembleRelease` | `mbbshandbook-release-apk` |
+| Release AAB (upload-key signed) | `bundleRelease` | `mbbshandbook-release-aab` |
 
-Download them from the **Actions tab → latest run → Artifacts**.
-Pushing a tag like `v1.0.0` also attaches all three files to a GitHub Release.
+Download them from the **Actions tab → latest run → Artifacts**. Release artifacts
+are produced only when all four signing secrets are configured; otherwise the
+run is debug-only. Pushing a tag like `v1.0.0` attaches all three files to a
+GitHub Release only after release signing succeeds.
 
 ## Play Store readiness
 
 The app is **not production-upload ready yet**. It now targets API 36 and has
-the publisher AdMob IDs, but release signing, privacy policy/Data Safety, store
-listing assets, content rating, and (for new personal accounts) closed testing still need to be
-completed. Checklist: [`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
+the publisher AdMob IDs, but a release upload key must be configured in GitHub
+Secrets before CI can produce a Play-uploadable AAB. Privacy policy/Data Safety,
+store listing assets, content rating, and (for new personal accounts) closed
+testing also still need to be completed. Checklist: [`docs/PLAYSTORE.md`](docs/PLAYSTORE.md).
 
-## Release signing
+## Release signing (required for Google Play)
 
-By default (no secrets configured) release artifacts are **debug-signed** so CI
-always produces installable test builds. Debug-signed builds are **not** accepted
-by the Play Store and cannot upgrade an existing release-signed install.
+Google Play rejects debug-signed APKs/AABs. This project **never falls back to
+debug signing for release builds**. Without an upload key, CI still runs tests
+and produces the clearly named debug APK, but skips release APK/AAB artifacts.
+AABs for Play must be signed with your private upload key; Play App Signing then
+manages the final app-signing key. Feature-branch/PR checks may run debug-only;
+main, version-tag and manually requested builds fail until signing is configured.
 
-To sign with your own release key:
+**Already published this app or enrolled an upload key?** Reuse that existing
+upload keystore and alias. A different key can cause an upload-key mismatch.
+For a new app, create a permanent upload key once and keep secure offline backups.
 
-1. Create a keystore (keep it safe — you need the same key for every future update):
+1. Create a keystore on your own computer (skip this if you already have one).
+   Use your own details and strong passwords; do not send them to chat:
 
    ```bash
    keytool -genkeypair -v -keystore release-keystore.jks -alias mbbskey \
      -keyalg RSA -keysize 2048 -validity 10000
    ```
 
-2. Base64-encode it: `base64 -w0 release-keystore.jks` (macOS: `base64 -i release-keystore.jks`)
+2. Encode the binary keystore for the GitHub secret:
 
-3. Add these **repository secrets** (Settings → Secrets and variables → Actions):
+   ```bash
+   # Linux
+   base64 -w0 release-keystore.jks > release-keystore.base64.txt
+   # macOS (instead): base64 -i release-keystore.jks -o release-keystore.base64.txt
+   ```
+
+3. In GitHub, open **Settings → Secrets and variables → Actions → New repository
+   secret** and add all four values. Enter values in GitHub, not in source files
+   or this conversation:
 
    | Secret | Value |
    |---|---|
-   | `KEYSTORE_BASE64` | the base64 string from step 2 |
+   | `KEYSTORE_BASE64` | contents of `release-keystore.base64.txt` |
    | `KEYSTORE_PASSWORD` | keystore password |
-   | `KEY_ALIAS` | e.g. `mbbskey` |
-   | `KEY_PASSWORD` | key password |
+   | `KEY_ALIAS` | the existing/new alias, e.g. `mbbskey` |
+   | `KEY_PASSWORD` | private-key password |
 
-The next CI run signs the release APK and AAB with your key automatically.
-**Never commit** `*.jks` / `keystore.properties` — they are gitignored.
+4. Re-run **Android Build** on `main` (or push a new commit). Download
+   `mbbshandbook-release-aab` from that **new** run and upload it to Play Console.
+   Older CI artifacts remain debug-signed; do not reuse them. The run must show
+   the release build/signature-verification steps and “Release upload certificate
+   verified”. Missing secrets produce a debug-only run, not a Play-ready AAB.
+
+For local release builds, create an ignored `keystore.properties` at the repo root:
+
+```properties
+storeFile=release-keystore.jks
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyAlias=YOUR_KEY_ALIAS
+keyPassword=YOUR_KEY_PASSWORD
+```
+
+Then run `./gradlew verifyReleaseSigning bundleRelease`. The guard checks the
+keystore, private-key alias and certificate validity, and rejects the Android
+debug certificate. CI additionally verifies the generated release APK with
+`apksigner`. The APK and AAB are signed with the same configured upload key.
+
+**Never commit or upload** `*.jks`, `*.keystore`, `keystore.properties`, or the
+base64 text as repository files/GitHub artifacts. They are ignored locally and
+removed from the CI workspace after the run. Keep the keystore and passwords
+backed up securely; losing the upload key requires a Play Console recovery process.
 
 ## Building locally
 
@@ -175,8 +214,8 @@ works out of the box.
 ```bash
 ./gradlew testDebugUnitTest     # unit tests
 ./gradlew assembleDebug         # debug APK  → app/build/outputs/apk/debug/
-./gradlew assembleRelease       # release APK → app/build/outputs/apk/release/
-./gradlew bundleRelease         # release AAB → app/build/outputs/bundle/release/
+./gradlew assembleRelease       # requires keystore.properties; never debug-signed
+./gradlew bundleRelease         # requires keystore.properties; upload-key signed
 ```
 
 Install the debug APK on a connected device: `adb install app/build/outputs/apk/debug/app-debug.apk`
