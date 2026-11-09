@@ -33,7 +33,9 @@ Console and release-engineering steps remain.
    - Re-run Android Build after adding secrets; upload only the newly generated
      `mbbshandbook-release-aab` after `verifyReleaseSigning` passes.
    - Enter credentials only in GitHub Secrets/local ignored files, never in chat
-     or committed files. See README → Release signing for the exact steps.
+     or committed files. For a new app, `python3 scripts/setup_release_signing.py`
+     generates and uploads them without printing secrets; back up its private
+     recovery directory. See README → Release signing for the exact steps.
 2. **Verify the live AdMob setup**
    - App ID `ca-app-pub-9529770421530115~3987689260`, banner unit
      `ca-app-pub-9529770421530115/5109199243`, and Native Advanced unit

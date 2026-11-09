@@ -10,12 +10,19 @@ app/build/
 captures/
 local.properties
 
-# Signing material - NEVER commit real keys
+# Signing material - NEVER commit real keys; keep backups outside the repo
 keystore.properties
 *.base64.txt
 *.jks
 *.keystore
+*.p12
+*.pfx
 release-keystore.jks
+RECOVERY-PRIVATE.txt
+
+# Python
+__pycache__/
+*.py[cod]
 
 # OS
 .DS_Store

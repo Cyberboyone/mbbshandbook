@@ -153,6 +153,36 @@ final app-signing key. Debug APK builds and unit tests do not require this key.
 upload keystore and alias. A different key can cause an upload-key mismatch.
 For a new app, create a permanent upload key once and keep secure offline backups.
 
+### Recommended: guided setup for a new app
+
+On **your own computer**, install Python 3.9+, JDK 17+ and GitHub CLI. Authenticate
+with `gh auth login` using your GitHub account (not a shared agent connection).
+Download `scripts/setup_release_signing.py` and run it standalone, or run it from
+a repository checkout:
+
+```bash
+gh auth login
+python3 setup_release_signing.py          # downloaded file
+# From a checkout instead: python3 scripts/setup_release_signing.py
+# Windows, if needed: py setup_release_signing.py
+```
+
+The script asks for confirmation, creates a new RSA-3072 PKCS12 upload key with
+a strong random password, and uploads all four values directly to GitHub Actions
+Secrets. PKCS12 uses the same password for both password secrets. It does not
+print passwords or write key material inside the repository.
+It saves a private recovery directory at `~/MBBSHandbook-signing-backup` (choose
+another location with `--backup-dir`). **Copy that directory to encrypted storage
+or a password manager immediately**; GitHub cannot reveal the values later.
+Existing signing secrets are not overwritten unless you explicitly pass
+`--replace-secrets`. Do not use this new-key script for an already enrolled app.
+
+After it succeeds, re-run Android Build and download the new release AAB. If
+`keytool` is not on PATH, pass `--keytool /path/to/keytool` (on Windows,
+`keytool.exe`, often under the JDK or Android Studio's bundled `jbr/bin`).
+
+### Manual setup (or an existing upload key)
+
 1. Create a keystore on your own computer (skip this if you already have one).
    Use your own details and strong passwords; do not send them to chat:
 
