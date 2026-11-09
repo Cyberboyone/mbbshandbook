@@ -51,9 +51,21 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > release-keystore.jks
+            missing=""
+            [ -n "$KEYSTORE_PASSWORD" ] || missing="$missing KEYSTORE_PASSWORD"
+            [ -n "$KEY_ALIAS" ] || missing="$missing KEY_ALIAS"
+            [ -n "$KEY_PASSWORD" ] || missing="$missing KEY_PASSWORD"
+            if [ -n "$missing" ]; then
+              echo "::error::KEYSTORE_BASE64 is set but these secrets are missing:$missing"
+              exit 1
+            fi
+            printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > release-keystore.jks
             printf 'storeFile=release-keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > keystore.properties
-            echo "Signing release artifacts with the configured release key."
+            # Fail fast if the keystore or alias/password is wrong.
+            keytool -list -v -keystore release-keystore.jks -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" > release-cert.txt
+            RELEASE_CERT_SHA256="$(awk '/SHA256:/{print $2; exit}' release-cert.txt | tr -d ':' | tr 'a-f' 'A-F')"
+            echo "RELEASE_CERT_SHA256=$RELEASE_CERT_SHA256" >> "$GITHUB_ENV"
+            echo "Signing release artifacts with the configured release key (cert SHA-256 $RELEASE_CERT_SHA256)."
           else
             echo "::warning::No KEYSTORE_BASE64 secret set - release artifacts will be debug-signed (fine for testing, NOT for Play Store upload). See README for how to add signing secrets."
           fi
@@ -66,6 +78,34 @@ jobs:
 
       - name: Build debug APK, release APK and release AAB
         run: ./gradlew assembleDebug assembleRelease bundleRelease --stacktrace
+
+      # Guards against shipping debug-signed artifacts to the Play Store:
+      # compares the release APK/AAB signer fingerprint against the release key.
+      - name: Verify release signatures
+        run: |
+          APKSIGNER="$(ls "$ANDROID_HOME"/build-tools/*/apksigner | tail -n 1)"
+          APK_CERT="$("$APKSIGNER" verify --print-certs app/build/outputs/apk/release/app-release.apk | awk '/certificate SHA-256 digest/{print $NF; exit}' | tr -d ':' | tr 'a-f' 'A-F')"
+          AAB_CERT="$(keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | awk '/SHA256:/{print $2; exit}' | tr -d ':' | tr 'a-f' 'A-F')"
+          {
+            echo "## 🔏 Release signing"
+            echo ""
+            echo "| Artifact | Signer cert SHA-256 |"
+            echo "|---|---|"
+            echo "| Release APK | \`$APK_CERT\` |"
+            echo "| Release AAB | \`$AAB_CERT\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$RELEASE_CERT_SHA256" ]; then
+            if [ "$APK_CERT" != "$RELEASE_CERT_SHA256" ] || [ "$AAB_CERT" != "$RELEASE_CERT_SHA256" ]; then
+              echo "::error::Release artifacts are NOT signed with the release key (expected $RELEASE_CERT_SHA256, APK=$APK_CERT, AAB=$AAB_CERT). Do not upload them."
+              echo "❌ Mismatch - do NOT upload to Play Console." >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+            echo "✅ Release APK and AAB are signed with the configured release key."
+            echo "✅ Signed with the release key - safe to upload to Play Console." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Release artifacts are debug-signed (no signing secrets configured). Do NOT upload them to the Play Store."
+            echo "⚠️ Debug-signed - do NOT upload to Play Console." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Collect artifacts
         run: |
